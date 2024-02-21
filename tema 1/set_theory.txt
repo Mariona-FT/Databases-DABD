@@ -1,0 +1,120 @@
+Exemples d'operacions conjuntistes amb SQLite:
+
+ sqlite3 set_theory.db
+ .exit
+
+ sqlite3 set_theory.db
+ .help
+ .databases
+ .tables
+ .fullschema
+ .headers on
+
+Tenim 3 conjunts d'enters i un de caràcters (fixeu-vos que les comandes SQL sempre acaben amb ;):
+ SELECT p FROM a;
+ SELECT q FROM b;
+ SELECT r FROM c;
+ SELECT s FROM d;
+
+Cardinalitat:
+ SELECT COUNT(*) FROM a;
+ SELECT COUNT(*) FROM b;
+ 
+Subconjunt:
+ SELECT p FROM a WHERE p%2=1;
+
+Unió, intersecció, complementari de dos conjunts:
+ SELECT p FROM a UNION SELECT q FROM b;
+ SELECT p FROM a UNION SELECT r FROM c;
+ SELECT p FROM a INTERSECT SELECT r FROM c;
+ SELECT p FROM a EXCEPT SELECT r FROM c;
+ 
+Producte cartesià de dos conjunts:
+ SELECT p,q FROM a,b;
+ .separator ,
+ SELECT p,q FROM a,b;
+ SELECT * FROM a,b;
+ SELECT COUNT(*) FROM a,b;
+ SELECT * FROM a,b ORDER BY q;
+ SELECT a.p, a2.p FROM a, a AS a2;
+  
+Producte cartesià de tres conjunts:
+ SELECT p,q,r FROM a,b,c;
+ SELECT * FROM a,b,c;
+ SELECT COUNT(*) FROM c;
+ SELECT COUNT(*) FROM a,b,c;
+
+Relació binària (té dos components) i selecció amb WHERE: 
+ SELECT p,q FROM a,b;
+ SELECT p,q FROM a,b WHERE q - p = 101;
+ SELECT * FROM a,c;
+ SELECT * FROM a,c WHERE p > r;
+ SELECT * FROM a,c WHERE p > r AND p < 4;
+
+Relació ternària:
+ SELECT p,q,r FROM a,b,c WHERE q - p = 101 AND q - p - r = 100;
+
+Materialització:
+ CREATE TABLE sq AS SELECT p, p*p FROM a;
+ 
+Projecció i com evitar duplicats amb DISTINCT quan la projecció genera duplicats:
+ SELECT p FROM sq;
+ SELECT "p*p" FROM sq;
+ SELECT p FROM a,b;
+ SELECT DISTINCT(p) FROM a,b;
+
+Composició de relacions:
+ SELECT * FROM c;
+ CREATE TABLE sum1 AS SELECT r, r+1 FROM c;
+ SELECT p, "r+1" FROM sq, sum1 WHERE "p*p" = r;
+
+Més difícil: elevar al quadrat dos cops només amb sq?
+Usant reanomenament: sq AS sq1, sq AS sq2
+ SELECT sq1.p, sq2."p*p" FROM sq AS sq1, sq AS sq2 WHERE sq1."p*p" = sq2.p;
+ SELECT sq1.p, sq1."p*p", sq2.p, sq2."p*p" FROM sq AS sq1, sq AS sq2;
+ SELECT sq1.p, sq1."p*p", sq2.p, sq2."p*p" FROM sq AS sq1, sq AS sq2 WHERE sq1."p*p" = sq2.p;
+
+Productes cartesians repetint els conjunts originals:
+ SELECT * FROM a, a AS a2;
+ SELECT p, p*p, q, q+1, s, s+p+q, c1.r, c2.r FROM a, b, c AS c1, c AS c2, d;
+
+Join:
+ CREATE TABLE sqsq AS SELECT p, p*p*p*p FROM a;
+ SELECT * FROM sqsq;
+ SELECT * FROM sq JOIN sqsq;
+ SELECT * FROM sq JOIN sqsq ON sq.p = sqsq.p;
+ SELECT * FROM sq JOIN sq AS sq2;
+ SELECT * FROM sq JOIN sq AS sq2 ON sq."p*p"=sq2.p;
+
+Agrupament (segons si p és parell o senar):
+ SELECT COUNT(*) FROM sq GROUP BY p%2=0;
+ SELECT MAX(p) FROM sq GROUP BY p%2=0;
+ SELECT MIN(p) FROM sq GROUP BY p%2=0;
+ SELECT SUM(p) FROM sq GROUP BY p%2=0;
+ SELECT * FROM sq GROUP BY p%2=0; /* Obtenim un registre qualsevol de cada grup, no útil */
+
+Subquery 
+ SELECT p FROM sq WHERE p%2=0;
+ SELECT * FROM sqsq WHERE p IN (SELECT p FROM sq WHERE p%2=0);
+
+Materialització o no: CREATE TABLE versus CREATE VIEW
+ CREATE VIEW sqsq_v AS SELECT p, p*p*p*p FROM a;
+ .fullschema
+ SELECT * FROM sqsq_v;
+ INSERT INTO a VALUES(5);
+ SELECT * FROM a;
+ SELECT * FROM sqsq;   /* No hi ha la tupla 5**4=625 */
+ SELECT * FROM sqsq_v; /* Si hi ha la tupla 5**4=625 pq es calcula amb un select a partir de a */
+
+Variants del JOIN
+ INSERT INTO sq VALUES(5,25);
+ INSERT INTO sqsq VALUES(6,1296);
+ SELECT * FROM sq LEFT JOIN sqsq ON sq.p = sqsq.p;
+ SELECT * FROM sq RIGHT JOIN sqsq ON sq.p = sqsq.p; /* SQLite no el té implementat */
+ SELECT * FROM sq FULL JOIN sqsq ON sq.p = sqsq.p;  /* SQLite no el té implementat */
+
+Actualitzar i eliminar tuples
+ UPDATE sq SET p=7,"p*p"=49 WHERE p=5;
+ SELECT * FROM sq;
+ DELETE FROM sq WHERE p=7;
+ SELECT * FROM sq;
