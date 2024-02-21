@@ -1,0 +1,26 @@
+Instruccions classe teoria tema 1:
+
+sqlite3
+ .open set theory.bd
+.database
+.fullschema
+
+sqlite3 set_theory.db
+.fullschema
+//instrucicons//
+
+.headers on → veuen headers bd
+. tables → taules q tens
+.SELECT * FROM  x; → veure tot lo de les taules q tens x..x
+
+SELECT p.q.r FROM a,b,c; → producte cartesia tots conjunts
+SELECT COUNT(*) FROM a,b,c → num total elements
+
+SELECT p FROM a UNION SELECT r FROM c; → unir seleccio p i r de les diferents bd
+SELECT p FROM a INTERSECT SELECT r FROM c; →intersecció entre a i c
+SELECT p FROM a EXCEPT SELECT r FROM c; → complementari (diferències) entre a i c
+
+SELECT p,q FROM a,b; → producte cartesia de a,b - totes les relacions possibles
+SELECT * FROM a,b WHERE q-p=101; → subconjunt de possibles parelles q compleixin condicio SELECT * FROM a,c WHERE p>r; → Relació binaria(2) subconjunt a i c q compleixi condicio
+SELECT * FROM a,b,c WHERE q-p =101 AND q-p-r=100; →Relació  ternària(3) 2 condicions
+
