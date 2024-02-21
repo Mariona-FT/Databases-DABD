@@ -1,0 +1,60 @@
+Instruccions utilitzades en la sessió:
+
+taula bàsica de contactes:
+
+sqlite> CREATE TABLE contactes (
+   ...> id INTEGER,
+   ...> firstname TEXT,
+   ...> lastname TEXT NOT NULL,
+   ...> email TEXT NOT NULL UNIQUE,
+   ...> PRIMARY KEY(id) 
+   ...> );
+sqlite> .tables
+contactes
+
+sqlite> INSERT INTO contactes VALUES(1,'ola','gonazalez','aa@gmail.com');
+sqlite> SELECT* FROM contactes;
+1|ola|gonazalez|aa@gmail.com
+
+borrar una taula:
+sqlite> DROP TABLE accounts;
+
+
+Crear taula accounts:
+sqlite> CREATE TABLE accounts (
+   ...> acc_id INTEGER,
+   ...> type CHAR(1),
+   ...> balance REAL,
+   ...> owner TEXT,
+   ...> owner_id INTEGER,
+   ...> phone INTEGER,
+   ...> address TEXT)
+   ...> ;
+
+importar valors del .txt a la taula:
+sqlite> .import accounts.txt accounts
+
+veure si s’han inserit correctament:
+sqlite> SELECT * FROM accounts;
+acc_id|type|balance|owner|owner_id|phone|address
+161320011440|P|1763.68|Tomé Cecial|6463525|223242|Camino de Criptana 2, Argamasilla
+161320011440|P|1763.68|Sancho Panza|6532345|222333|Corrales s/n, Argamasilla
+111930116980|C|1564.27|Álvaro Tarfe|6112452|334455|Avellaneda 2, Granada
+
+crear taules +inserir des de .sql:
+ sqlite3 accounts2.db < accounts.sql 
+
+Consultes:
+bd: accounts
+types : acc_id|type|balance|owner|owner_id|phone|address
+
+tots dnis i únic:  sqlite> SELECT DISTINCT owner_id FROM accounts;
+dni persona en particular:
+comptes saldo superior 1000: 
+Comptes q no son tipus L:
+Saldo disponible per cadascun titulars (sumant comptes )sense repeticions:
+nom i telf sense repeticions dni del alonso quijano (subquerys):
+parells noms mateixa persona,dni, sense repeticions( joins 5tuples):
+Compte saldo major:
+Compte saldo menor:
+
