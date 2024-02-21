@@ -30,6 +30,29 @@ SUPERVISIÓ 1.*____________________0.* MÀQUINES---construides-----FABRICANT
 			-DNI
 			-DadesPersonals
 
+Creació de taules: (sense fabricant)
+
+maq- maquina
+evsup-supervisio
+tec-tecnic
+
+CREATE TABLE maq
+	(ninv int NOT NULL, fab text, PRIMARY KEY(ninv));
+	
+CREATE TABLE evsup
+	(fh text NOT NULL, PRIMARY KEY(fh));
+	
+CREATE TABLE tec (
+	dni int NOT NULL, dp text,
+	fh text NOT NULL,
+	ninv int NOT NULL,
+	FOREIGN KEY (fh) REFERENCES evsup
+		ON UPDATE CASCADE,
+	FOREIGN KEY (ninv) REFERENCES maq
+		ON UPDATE CASCADE,
+	PRIMARY KEY(fh,ninv), UNIQUE(fh,dni));
+
+
 Creació un altre exemple:
 
 Estructura:
@@ -53,3 +76,45 @@ CREATE TABLE CLIENTS (
 	);
 	
 relació entre taules --> codi_ciutats INT REFERENCE CIUTATS.codi
+ les relacions sempre han de relacionar a una clau primaria d'una altre classe
+ 
+
+Hi han CIUTATS mateix nom en DIFERENTS PAISOS
+
+Re Estructura:
+PAISOS 1 ___1.*	CIUTATS 1_____1.* CLIENTS
+-nom 		 -dni
+		 -nom	
+		
+
+Creació de taules:
+CREATE TABLE PAISOS (
+	codi INT PRIMARY KEY,
+	num VARCHAR(90) NOT NULL
+	);
+			
+CREATE TABLE CIUTATS (
+	codi INT PRIMARY KEY,
+	num VARCHAR(90) NOT NULL
+	);
+
+CREATE TABLE CLIENTS (
+	dni TEXT PRIMARY KEY,
+	nom VARCHAR(90) NOT NULL
+	codi_ciutats INT REFERENCE CIUTATS.codi
+	);
+	
+	
+Re Estructura:
+
+CREATE TABLE ciutat(
+	nom ciutat VARCHAR(50) NOT NULL,
+	nom pais VARCHAR(20) NOT NULL,
+	PRIMARY KEY(nom ciutat, nom pais));
+
+CREATE TABLE client (
+codi CHAR(8) NOT NULL PRIMARY KEY,
+	nom ciutat VARCHAR(50) NOT NULL,
+	nom pais VARCHAR(20) NOT NULL,
+	FOREIGN KEY (nom ciutat, nom pais) REFERENCES ciutat);
+
