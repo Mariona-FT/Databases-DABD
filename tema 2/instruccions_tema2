@@ -1,0 +1,55 @@
+Instruccions classe teoria tema 2:
+
+Problema: Màquines de la factoria, I
+Una factoria immensa té una elevada quantitat de màquines. De
+cadascuna tenim el número amb que està inventariada i el seu
+fabricant.
+Periòdicament, un tècnic supervisa individualment cada màquina.
+Cada tècnic, de qui coneixem el DNI i les seves dades personals,
+coneix la distribució de la seva setmana laboral en franjes horàries
+amb la indicació de quina màquina ha de supervisar en cadascuna
+d’aquestes franges.
+
+Classes-taules:
+
+TÉCNICS 1.*____________________	0.* MÀQUINES---construides-----FABRICANT
+- DNI			|	- id_maquina			-nom
+- DadesPersonals	|	
+			|
+		SUPERVISIÓ
+		-franja
+		
+INCORRECTE: només pot haver-hi UNA supervisió entre tecnics i màquines en tota la vida
++la franja es una llista limitada de hores - ha de ser una classe sola
+
+SUPERVISIÓ 1.*____________________0.* MÀQUINES---construides-----FABRICANT
+- franja		|	- id_maquina			-nom
+			|	
+			|
+			TÉCNIC
+			-DNI
+			-DadesPersonals
+
+Creació un altre exemple:
+
+Estructura:
+
+CIUTATS 1_____1.* CLIENTS
+-codi 		 -dni
+-nom		 -nom	
+		
+
+Creació de taules:
+		
+CREATE TABLE CIUTATS (
+	codi INT PRIMARY KEY,
+	num VARCHAR(90) NOT NULL
+	);
+
+CREATE TABLE CLIENTS (
+	dni TEXT PRIMARY KEY,
+	nom VARCHAR(90) NOT NULL
+	codi_ciutats INT REFERENCE CIUTATS.codi
+	);
+	
+relació entre taules --> codi_ciutats INT REFERENCE CIUTATS.codi
