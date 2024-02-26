@@ -1,0 +1,63 @@
+161320011440|P|1763.68|Tomé Cecial|6463525|223242|Camino de Criptana 2, Argamasilla
+161320011440|P|1763.68|Sancho Panza|6532345|222333|Corrales s/n, Argamasilla
+111930116980|C|1564.27|Álvaro Tarfe|6112452|334455|Avellaneda 2, Granada
+134300219657|C|1438.91|Sancho de Azpetia|5645342|313233|Caserío Los Sanchos, Zubiarri
+101790319782|L|1915.02|Roque Guinart|6812345|555453|Camí dels Lladres s/n, Oristà
+101790319782|L|1915.02|Juan Haldudo|6123456|253647|Plaza del Ayuntamiento 3, Quintanar
+139840414160|C|2088.97|Alonso Quijano|6543234|213243|Mayor 8, Argamasilla
+108210513275|C|713.77|Caballero de los Espejos|6435323|234678|Mayor 11, Argamasilla
+128490611458|L|1273.05|Pedro Pérez Mazorca|6788765|515253|Almacenes 3, Ínsula Barataria
+198270715673|C|1680.24|Teresa Panza|6425312|222333|Corrales s/n, Argamasilla
+198440815239|A|1271.18|Lorenzo Corchuelo|6554632|243546|Muro Blanco 2, El Toboso
+198440815239|A|1271.18|Gaspar Gregorio|6546561|212223|Plaza Grande 1, Argamasilla
+104310914895|P|808.38|Pedro Alonso|6564321|223344|Molinos 2, Argamasilla
+190341014619|P|446.45|Roque Guinart|6812345|555453|Camí dels Lladres s/n, Oristà
+190341014619|P|446.45|Caballero del Verde Gabán|6677345|252627|Solares de Miranda s/n, Villarejo de Fuentes
+185121112058|A|1720.68|Pedro Recio de Agüero|6336262|232425|Hospital de Osuna 1, Tirteafuera
+122191313119|P|2187.9|Caballero del Verde Gabán|6677345|252627|Solares de Miranda s/n, Villarejo de Fuentes
+147311412572|L|2140.72|Antonio Moreno|6871254|545352|Ramblas 5, Barcelona
+147311412572|L|2140.72|Caballero de la Triste Figura|6543234|213243|Mayor 8, Argamasilla
+120081517656|P|93.15|Tomé Carrasco|6466543|223233|Camino de Criptana 5, Argamasilla
+121601616158|L|1212.5|Guiomar de Quiñones|6788723|564534|Regente de Nápoles 2, Zaragoza
+186341717529|C|796.13|Caballero de la Blanca Luna|6435323|234678|Mayor 11, Argamasilla
+166801814075|L|1270.14|Sancho Panza|6532345|222333|Corrales s/n, Argamasilla
+144721910292|P|1280.74|Tomé Carrasco|6466543|223233|Camino de Criptana 5, Argamasilla
+144721910292|P|1280.74|Álvaro Tarfe|6112452|334455|Avellaneda 2, Granada
+190562015816|P|1985.52|Pedro Pérez Mazorca|6788765|515253|Almacenes 3, Ínsula Barataria
+190562015816|P|1985.52|Diego de Miranda|6677345|252627|Solares de Miranda s/n, Villarejo de Fuentes
+148452111241|P|3190.55|Pedro Noriz|6873413|544332|Ramblas 7, Barcelona
+155432214678|C|1551.99|Ginés de Pasamonte|4455336|393735|Durabanca s/n, Galeras del Rey
+187672313913|C|825.69|Diego de Miranda|6677345|252627|Solares de Miranda s/n, Villarejo de Fuentes
+133502416828|P|803.25|Pedro Noriz|6873413|544332|Ramblas 7, Barcelona
+100232512827|L|1838.25|Caballero de la Blanca Luna|6435323|234678|Mayor 11, Argamasilla
+122812616034|P|687.78|María Tornes|6152436|353334|Venta del Ventero, Socuéllamos
+173512714203|A|1562.46|Ginés de Pasamonte|4455336|393735|Durabanca s/n, Galeras del Rey
+124252919902|P|2178.41|Pedro Recio de Agüero|6336262|232425|Hospital de Osuna 1, Tirteafuera
+120773016869|C|1642.59|Aldonza Nogales|6551234|243546|Muro Blanco 2, El Toboso
+181473116846|L|152.57|Caballero de la Triste Figura|6543234|213243|Mayor 8, Argamasilla
+181473116846|L|152.57|Caballero de la Blanca Luna|6435323|234678|Mayor 11, Argamasilla
+131603211155|A|1155.01|Diego de la Llana|6783456|514131|Huertos s/n, Ínsula Barataria
+131603211155|A|1155.01|Pedro Recio de Agüero|6336262|232425|Hospital de Osuna 1, Tirteafuera
+158063312140|C|3162.25|Juan Haldudo|6123456|253647|Plaza del Ayuntamiento 3, Quintanar
+197733410308|C|8061.95|Lorenzo Corchuelo|6554632|243546|Muro Blanco 2, El Toboso
+136123511800|P|1848.48|Lorenzo Corchuelo|6554632|243546|Muro Blanco 2, El Toboso
+185503612858|L|2442.98|Caballero de la Triste Figura|6543234|213243|Mayor 8, Argamasilla
+112633718692|L|873.11|Antonio Moreno|6871254|545352|Ramblas 5, Barcelona
+112633718692|L|873.11|Sancho Panza|6532345|222333|Corrales s/n, Argamasilla
+142743815341|C|4641.28|Sansón Carrasco|6435323|234678|Mayor 11, Argamasilla
+189853916707|L|2236.17|Alonso López|6656223|292827|Camino Alcobendas 10, Baeza
+189853916707|L|2236.17|Tomé Carrasco|6466543|223233|Camino de Criptana 5, Argamasilla
+193024011713|A|168.6|Sancho de Azpetia|5645342|313233|Caserío Los Sanchos, Zubiarri
+193024011713|A|168.6|Diego de Miranda|6677345|252627|Solares de Miranda s/n, Villarejo de Fuentes
+177474119720|A|4047.35|Pedro Noriz|6873413|544332|Ramblas 7, Barcelona
+183384214435|C|1243.68|Pedro Pérez Mazorca|6788765|515253|Almacenes 3, Ínsula Barataria
+183384214435|C|1243.68|Vivaldo Cachopín|5463524|414243|Revellón 14, Laredo
+171174310952|C|28.89|Caballero de la Blanca Luna|6435323|234678|Mayor 11, Argamasilla
+131004410694|C|9180.13|Caballero de los Espejos|6435323|234678|Mayor 11, Argamasilla
+132824513854|P|2531.55|Sancho de Azpetia|5645342|313233|Caserío Los Sanchos, Zubiarri
+174604610317|A|1678.59|Juan Haldudo|6123456|253647|Plaza del Ayuntamiento 3, Quintanar
+164784718083|P|2404.47|Antonio Moreno|6871254|545352|Ramblas 5, Barcelona
+104444810018|C|8510.36|Ginés de Pasamonte|4455336|393735|Durabanca s/n, Galeras del Rey
+104444810018|C|8510.36|Caballero del Verde Gabán|6677345|252627|Solares de Miranda s/n, Villarejo de Fuentes
+119774916201|C|9818.59|Alonso López|6656223|292827|Camino Alcobendas 10, Baeza
+119774916201|C|9818.59|Pedro Alonso|6564321|223344|Molinos 2, Argamasilla

@@ -1,0 +1,129 @@
+Instruccions utilitzades en la sessió 2:
+p.13 /
+connectar-se al ubiwan utilitzant l'usuari especific donat
+entrar a les mysql del servidor : mysql -u est_userubiwan -p
+Enter password:  dB.userubiwan
+
+entrar a la base de dades del usuari:
+mysql> \u est_userubiwan
+
+Crear taula de mascotes:
+mysql> CREATE TABLE pets ( nom TEXT, data_naix INTEGER, tipus TEXT, pes INTEGER);
+Query OK, 0 rows affected (0.07 sec)
+
+Insertar varies mascotes de gats i gossos:
+mysql> INSERT INTO pets VALUES('lola',120802,'gos',15);
+mysql> INSERT INTO pets VALUES('perry',040810,'cavall',78);
+mysql> INSERT INTO pets VALUES('cutie',021201,'gat',7);
+mysql> INSERT INTO pets VALUES('po',021207,'gat',13);
+mysql> INSERT INTO pets VALUES('nina',040707,'gos',11);
+mysql> INSERT INTO pets VALUES('taques',031022,'gos',8);
+
+Consultes bàsiques:
+mysql> SELECT nom,tipus FROM pets WHERE tipus='gat';
++-------+-------+
+| nom   | tipus |
++-------+-------+
+| cutie | gat   |
+| po    | gat   |
++-------+-------+
+
+mysql> SELECT nom,tipus FROM pets WHERE tipus='gos';
++--------+-------+
+| nom    | tipus |
++--------+-------+
+| lola   | gos   |
+| nina   | gos   |
+| taques | gos   |
++--------+-------+
+
+Fer un update del pes d'un gat:
+
+mysql> SELECT nom,tipus,pes FROM pets WHERE tipus='gat';
++-------+-------+------+
+| nom   | tipus | pes  |
++-------+-------+------+
+| cutie | gat   |    7 |
+| po    | gat   |   13 |
++-------+-------+------+
+2 rows in set (0.00 sec)
+
+mysql> UPDATE pets SET pes=10 WHERE nom='cutie';
+Query OK, 1 row affected (0.01 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> SELECT nom,tipus,pes FROM pets WHERE tipus='gat';
++-------+-------+------+
+| nom   | tipus | pes  |
++-------+-------+------+
+| cutie | gat   |   10 |
+| po    | gat   |   13 |
++-------+-------+------+
+2 rows in set (0.00 sec)
+
+Eliminar un gos que ha passat a una altra vida:
+
+mysql> DELETE FROM pets WHERE nom=taques;
+ERROR 1054 (42S22): Unknown column 'taques' in 'where clause'
+mysql> DELETE FROM pets WHERE nom='taques';
+Query OK, 1 row affected (0.02 sec)
+
+mysql> SELECT nom,tipus FROM pets WHERE tipus='gos';
++------+-------+
+| nom  | tipus |
++------+-------+
+| lola | gos   |
+| nina | gos   |
++------+-------+
+2 rows in set (0.00 sec)
+
+Create view de nomes gossos:
+
+mysql> CREATE VIEW view_gossos AS SELECT nom,tipus,data_naix FROM pets WHERE tipus='gos' ; 
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> SELECT * FROM view_gossos;
++------+-------+-----------+
+| nom  | tipus | data_naix |
++------+-------+-----------+
+| lola | gos   |    120802 |
+| nina | gos   |     40707 |
++------+-------+-----------+
+2 rows in set (0.00 sec)
+
+
+Create view de la mitjana dels pesos per tipus de mascota:
+
+mysql> CREATE VIEW view_average_pets AS SELECT tipus,AVG(pes) AS mitjana FROM pets GROUP BY tipus;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> SELECT *  FROM view_average_pets;
++--------+---------+
+| tipus  | mitjana |
++--------+---------+
+| gos    | 13.0000 |
+| cavall | 78.0000 |
+| gat    | 11.5000 |
++--------+---------+
+3 rows in set (0.00 sec)
+
+Seleccionar una caracteristica de una vista:
+
+mysql> SELECT mitjana  FROM view_average_pets;
++---------+
+| mitjana |
++---------+
+| 13.0000 |
+| 78.0000 |
+| 11.5000 |
++---------+
+3 rows in set (0.00 sec)
+
+Eliminar una vista:
+
+mysql> DROP VIEW view_average_pets;
+Query OK, 0 rows affected (0.01 sec)
+
+
+
+
