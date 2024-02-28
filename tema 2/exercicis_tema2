@@ -16,7 +16,7 @@ DELEGACIO 0.1_______ubicacio__________1 CIUTAT
 +nom					+nom
 					+nomoriginal
 
-clau primaria : Delegacio - nom , Ciutat - nom
+Clau primaria : Delegacio - nom , Ciutat - nom
 una ciutat una sola delegació
 una delegació  ha d’existir en una ciutat 
 
@@ -70,8 +70,10 @@ dietes diferents en diferents viatges).
 DELEGACIO 0.1_______ubicacio__________1 CIUTAT	
 +nom					+nom
  1					+nomoriginal
-|						1-*						      
- 1..*						|
+|		DIETA				1-*	
+|		+import				|
+|		 |				|			      
+ 1..*		 |				|
 VIATGE 0.*--------------			|
 +codi			|			|
  0..*			|			|
@@ -91,5 +93,6 @@ CLIENT			------------1.* CONDUCTOR
 			+salari
 			
 Viatge- identitat feble- delegació identifica el viatge no es independent
+Dieta -classe relacional entre Viatge i conductor
 Claus primaria: Viatge - codi - identitat feble organitzats per delegacions
 
