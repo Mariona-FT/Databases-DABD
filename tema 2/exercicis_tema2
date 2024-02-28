@@ -71,14 +71,14 @@ DELEGACIO 0.1_______ubicacio__________1 CIUTAT
 +nom					+nom
  1					+nomoriginal
 |		DIETA				1-*	
-|		+import				|
+|organitzacio	+import				|
 |		 |				|			      
  1..*		 |				|
 VIATGE 0.*--------------			|
 +codi			|			|
  0..*			|			|
 |			|			| vivenda
-|			|			|
+|contractacio		|			|
 |			|			|
  1			|			0..*
 CLIENT			------------1.* CONDUCTOR	
@@ -95,4 +95,29 @@ CLIENT			------------1.* CONDUCTOR
 Viatge- identitat feble- delegació identifica el viatge no es independent
 Dieta -classe relacional entre Viatge i conductor
 Claus primaria: Viatge - codi - identitat feble organitzats per delegacions
+
+Esquema relacional:
+CLIENT (codi INT AUTOINCREMENT PK,
+ 	nomemp TEXT NOT NULL, 
+	telefon TEXT NOT NULL UNIQUE )
+CIUTAT (nom TEXT PK,
+	nomoriginal TEXT NOT NULL)
+DELEGACIO (nom TEXT PK, 
+	ubicacio TEXT FK REFERENCES (CIUTAT.nom) NOT NULL) 
+CONDUCTOR (codi INT AUTOINCREMENT PK,
+	nom TEXT NOT NULL, 
+	any_neixament  DATE NOT NULL ,
+	vivenda TEXT FK REFERENCES (ciutat.nom) NOT NULL)
+PROPIS (codi INT PK FK REFERENCES (conductor.codi),
+ 	nivell_estudis CHAR NOT NULL, 
+	salari FLOAT NOT NULL)
+SUBCONTRACTAT (codi INT PK FK REFERENCES (conductor.codi),	
+	any_carnet DATE NOT NULL)
+VIATGE (codi INT,  
+	organitzacio TEXT FK REFERENCES (delegacio.nom), PK, 
+	 codiclient INT FK REFERENCES(client.codi) NOT NULL)
+DIETA ( {codiconductor INT FK REFERENCE(conductor.codi), 
+	codiviatge INT FK REFERENCES (viatge.codi), 
+	organitzacio TEXT FK REFERENCE (viatge.organitzacio) ) } PK, 
+	import FLOAT NOT NULL)
 
