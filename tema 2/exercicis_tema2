@@ -1,0 +1,95 @@
+Exercicis Teoria tema 2:
+
+11 Transport internacional
+Una importantíssima empresa catalana dedicada al transport internacional (àmbit europeu)
+de mercaderies, ens demana que li dissenyem una base de dades per facilitar certs aspectes de la gestió de la informació. Després d’estudiar el tema hem escrit aquestes notes en què es descriuen els aspectes que ens han semblat importants. Aquestes notes han estat acceptades com a correctes per l’empresa.
+
+11.1 Organització internacional
+L’empresa disposa de delegacions repartides per tota la geografia europea. Tota delegació
+té un nom assignat que és com se la coneix. En una ciutat pot haver com a màxim una
+delegació.
+Es vol tenir un directori de ciutats (o poblacions) amb el nom amb què es coneixen a
+Catalunya i el seu nom original. Suposem que en el context en què es mou l’empresa, no hi
+ha dues poblacions amb el mateix nom.
+
+DELEGACIO 0.1_______ubicacio__________1 CIUTAT	
++nom					+nom
+					+nomoriginal
+
+clau primaria : Delegacio - nom , Ciutat - nom
+una ciutat una sola delegació
+una delegació  ha d’existir en una ciutat 
+
+
+11.2 Conductors i clients
+Dels conductors contractats per l’empresa es vol disposar de la informació següent: codi
+intern (és un nombre donat per l’empresa, amb el qual s’identifiquen els conductors), nom
+i any de naixement. Els conductors es divideixen en dos grans grups:
+Propis, dels quals interessa conèixer el seu nivell d’estudis (codi d’un caràcter) i el seu salari.
+Subcontractats, dels quals interessa l’any d’obtenció del carnet de conduir.
+Els conductors no estan associats a cap delegació. Cada conductor viu en una ciutat.
+Els clients solen ser grans empreses multinacionals. S’identifiquen per un codi de client.
+De cada client es vol disposar del seu nom d’empresa i telèfon.
+
+DELEGACIO 0.1_______ubicacio__________1 CIUTAT	
++nom					+nom
+					+nomoriginal
+						1..1
+						|
+						| vivenda
+						|
+						0..*
+CLIENT					CONDUCTOR	
++ codi					+codi
++nom_empr				+nom
++telefon				+any_neix
+					      ↑
+		         -------------------|--------------------
+			↓					↓
+			PROPIS				SUBCONTRACTAT
+			+nivell_estudis			+any_carnet
+			+salari
+			
+Clau primaria: Client - codi , Conductor - codi
+Subcategories de Conductor: Propis , Subcontractat
+
+
+
+11.3 Activitat de transport
+Els viatges que efectua l’empresa no estan estandarditzats (al contrari de les agències de
+viatges turístics). S’organitzen un a un segons les necessitats puntuals dels clients i són
+organitzats per les delegacions. 
+Cada delegació identifica cada viatge amb un codi numèric.
+En un viatge hi poden participar més d’un conductor (la normativa legal exigeix que en els
+viatges llargs hi hagi més d’un conductor, i que aquests es vagin tornant).
+Per a cada viatge es vol saber quin conductor o conductors l’han realitzat i les seves
+dietes. A cada conductor se li assigna una dieta per cada viatge concret (en un mateix
+viatge poden cobrar diferent import els diferents conductors i el mateix conductor pot tenir
+dietes diferents en diferents viatges).
+
+DELEGACIO 0.1_______ubicacio__________1 CIUTAT	
++nom					+nom
+ 1					+nomoriginal
+|						1-*						      
+ 1..*						|
+VIATGE 0.*--------------			|
++codi			|			|
+ 0..*			|			|
+|			|			| vivenda
+|			|			|
+|			|			|
+ 1			|			0..*
+CLIENT			------------1.* CONDUCTOR	
++ codi					+codi
++nom_empr				+nom
++telefon				+any_neix
+					      ↑
+		         -------------------|--------------------
+			↓					↓
+			PROPIS				SUBCONTRACTAT
+			+nivell_estudis			+any_carnet
+			+salari
+			
+Viatge- identitat feble- delegació identifica el viatge no es independent
+Claus primaria: Viatge - codi - identitat feble organitzats per delegacions
+
