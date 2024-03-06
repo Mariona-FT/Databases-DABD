@@ -44,6 +44,22 @@ Dependències funcionals:
   	i 3NF
   	
   	(Clau forana es la clau primària de la taula destí)
+  (UNIQUE KEY-quan ja tens una PRIMARY KEY ja establerta pero l'atribut es pot comportar com una clau de la taula)
+  	
+ UML:
+ 
+ COMPTES 0.*________________1.* TITULARS 1.*________viu_______1	ADRECES
+ +acc_id	|		+owner_id			+address
+ -type		|		-				-phone (UK)
+ -balance	|
+		|
+		CONTRACTES
+		-owner
+ 									
+ +=Pk							
+ 									
+ 								
+ 							
  Variants:
 1. cada compte té un únic titular
 2. cada persona només pot ser titular d’un compte
