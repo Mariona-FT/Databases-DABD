@@ -1,0 +1,53 @@
+Exercicis Teoria tema 3:
+
+3 Comptes bancaris
+Considerem un context d’activitat bancària representat mitjançant una única relació, amb
+els següents atributs:
+• número d’un compte bancari; acc_id
+• classe del compte (corrent, estalvis, llibreta…): type
+• saldo; balance
+• nom del titular del compte (un mateix compte pot tenir diversos titulars, que apareixen
+documentats en tuples diferents); owner
+• adreça, telèfon i NIF del titular.
+Alguns titulars apareixen amb noms diferents; sabem que es tracta del mateix titular
+quan el seu NIF coincideix. 
+El telèfon és fix, no mòbil; per tant, persones que visquin en la mateixa direcció tenen
+també el mateix telèfon. address, phone, owner_id
+
+Taula antiga accounts:
+accounts(acc_id,type,balance,owner,owner_id, address, phone)
+
+Dependències funcionals:
+ owner_id-> address, phone (persona només viu en un lloc)
+ phone->address
+ address->phone (telefon fixe i adreça fixe)
+	NO address, phone -> owner_id (mateixa adreça pot viure +d'una persona) 
+ 	NO owner_id-> owner (poden tenir varis noms)
+ 	NO owner ->owner_id  (un nom no determina el id, problema si noms iguals)
+ acc_id ->balance, type (determinats per la account)
+ acc_id , owner_id -> owner (dif account amb mateix un owner id tenen noms diferents)
+ 
+ 
+ TAULES:
+ R1 (owner_id,address) PK: owner_id  FK: adress=R2.address
+ R2 (address,phone)  PK: address, UNIQUEK:phone
+ R3 (acc_id, balance,type)  PK: acc_id
+ R4 (acc_id, owner_id,owner) PK:acc_id, owner_id FK: acc_id=R3.acc_id, owner_id=R1.owner_id
+ 
+ nom taules:
+ R1: titulars
+ R2: Adreces
+ R3: Comptes
+ R4: Contractes
+ 
+ NORMALITZAT AMB BCNF - totes dependències en forma de CLAU (owner_id,phone,address,acc_id)
+  	i 3NF
+  	
+  	(Clau forana es la clau primària de la taula destí)
+ Variants:
+1. cada compte té un únic titular
+2. cada persona només pot ser titular d’un compte
+3. cada persona només pot ser titular d’un compte de cada classe
+4. una persona no té una única direcció sinó potser diverses (Personal, laboral, segona
+residència…) i a més en cadascuna d’elles pot haver-hi diversos telèfons
+
