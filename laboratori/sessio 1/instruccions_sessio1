@@ -1,6 +1,12 @@
 Instruccions utilitzades en la sessió 1:
 p.0/13
 
+Instal·lar SQLite3
+	instruccions SQL acaben en ;
+	instruccions NO SQL precedides per . punt => .exit .databases .tables .schema
+			.mode .output .import . read
+
+Crear nou fitxer: sqlite fitxer.db == Obrir bades de dades 
 taula bàsica de contactes:
 
 sqlite> CREATE TABLE contactes (
