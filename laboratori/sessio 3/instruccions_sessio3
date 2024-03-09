@@ -1,0 +1,42 @@
+Instruccions utilitzades en la sessió 3:
+p.22 / 26
+
+/ **INFORMATION SCHEMA ** /
+MYSQL:
+
+Sortir de la meva base de dades - entrar a information_shema
+mysql> \u information_schema
+
+mysql> SELECT table_name, column_name, column_type  FROM columns WHERE table_name='accounts';
++------------+-------------+--------------+
+| TABLE_NAME | COLUMN_NAME | COLUMN_TYPE  |
++------------+-------------+--------------+
+| accounts   | acc_id      | bigint       |
+| accounts   | type        | char(1)      |
+| accounts   | balance     | double       |
+| accounts   | owner       | varchar(40)  |
+| accounts   | owner_id    | int          |
+| accounts   | phone       | int          |
+| accounts   | address     | varchar(100) |
++------------+-------------+--------------+
+7 rows in set (0.00 sec)
+
+
+POSTGRESQL:
+est_userubu=> SELECT udt_catalog, column_name, udt_name FROM information_schema.columns WHERE table_name='accounts';
+ udt_catalog  | column_name | udt_name 
+--------------+-------------+----------
+ est_userubiw | acc_id      | int8
+ est_userubiw | type        | bpchar
+ est_userubiw | balance     | float4
+ est_userubiw | owner       | varchar
+ est_userubiw | owner_id    | int4
+ est_userubiw | phone       | int4
+ est_userubiw | address     | varchar
+(7 rows)
+
+Normalització:
+
+
+
+
