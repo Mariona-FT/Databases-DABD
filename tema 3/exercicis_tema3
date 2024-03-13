@@ -18,16 +18,15 @@ Taula antiga accounts:
 accounts(acc_id,type,balance,owner,owner_id, address, phone)
 
 Dependències funcionals:
- owner_id-> address, phone (persona només viu en un lloc)
- phone->address
+ ower_id -> address, phone (persona només viu en un lloc)
+ phone -> address
  address->phone (telefon fixe i adreça fixe)
 	NO address, phone -> owner_id (mateixa adreça pot viure +d'una persona) 
  	NO owner_id-> owner (poden tenir varis noms)
  	NO owner ->owner_id  (un nom no determina el id, problema si noms iguals)
  acc_id ->balance, type (determinats per la account)
- acc_id , owner_id -> owner (dif account amb mateix un owner id tenen noms diferents)
- 
- 
+ acc_id, owner_id -> owner (dif account amb mateix un owner id tenen noms diferents)
+  
  TAULES:
  R1 (owner_id,address) PK: owner_id  FK: adress=R2.address
  R2 (address,phone)  PK: address, UNIQUEK:phone
@@ -35,10 +34,11 @@ Dependències funcionals:
  R4 (acc_id, owner_id,owner) PK:acc_id, owner_id FK: acc_id=R3.acc_id, owner_id=R1.owner_id
  
  nom taules:
- R1: titulars
- R2: Adreces
- R3: Comptes
- R4: Contractes
+ R1: titulars (owner_id,address) PK: owner_id  FK: adress=Adreces.address
+ R2: adreces (address,phone)  PK: address, UNIQUEK:phone
+ R3: comptes (acc_id, balance,type)  PK: acc_id
+ R4: contractes (acc_id, owner_id,owner) PK:acc_id, owner_id FK: acc_id=Comptes.acc_id, 
+ 								owner_id=titulars.owner_id
  
  NORMALITZAT AMB BCNF - totes dependències en forma de CLAU (owner_id,phone,address,acc_id)
   	i 3NF
