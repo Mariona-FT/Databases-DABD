@@ -1,0 +1,77 @@
+Instruccions utilitzades en la sessió 4:
+p.27 / 36
+
+descarregar les seguents carpetes en ubiwan:
+- dins de ubiwan!
+$ cd /home/public/dabd/
+
+copiar i posar en el nostre usuari:
+u@ubiwan:/home/public/dabd$ cp -r 03claus_foranees/ /home/est/userubi/DABD/
+u@ubiwan:/home/public/dabd$ cp -r 04python_sqlinjection/ /home/est/userubi/DABD/
+
+
+*Exercicis 03claus_foranees:*
+
+Per utilitzar el sqlite millor descarregar-ho en local:
+
+Crear una base de dades per la .sql:
+
+DABD/laboratori/sessio 4/03claus_foranees$ sqlite3 fabrica.db
+SQLite version 3.37.2 2022-01-06 13:25:41
+Enter ".help" for usage hints.
+
+Indicar que es poden utilitzar claus foranes:
+sqlite> PRAGMA foreign keys = ON;
+
+Llegir el .sql dins de la base de dades creada:
+
+sqlite> .read maqfact_foreign_keys.sql
+Error: near line 13: in prepare, table tec already exists (1)
+Error: near line 14: in prepare, table maq already exists (1)
+Error: near line 15: in prepare, table evsup already exists (1)
+Error: near line 16: in prepare, table supervisio already exists (1)
+CREATE TABLE tec (dni int NOT NULL, dp text, PRIMARY KEY(dni));
+CREATE TABLE maq (ninv int NOT NULL, fab text, PRIMARY KEY(ninv));
+CREATE TABLE evsup (fh text NOT NULL, PRIMARY KEY(fh));
+CREATE TABLE supervisio (
+  dni int NOT NULL,
+  ninv int NOT NULL,
+  fh text NOT NULL,
+  FOREIGN KEY (dni) REFERENCES tec ON UPDATE CASCADE, 
+  FOREIGN KEY (ninv) REFERENCES maq ON UPDATE CASCADE,
+  FOREIGN KEY (fh) REFERENCES evsup ON UPDATE CASCADE,
+  PRIMARY KEY(fh,dni), UNIQUE(fh,ninv));
+CREATE TABLE supervisio (
+  dni int NOT NULL,
+  ninv int NOT NULL,
+  fh text NOT NULL,
+  FOREIGN KEY (dni) REFERENCES tec ON UPDATE CASCADE, 
+  FOREIGN KEY (ninv) REFERENCES maq ON UPDATE CASCADE,
+  FOREIGN KEY (fh) REFERENCES evsup ON UPDATE CASCADE,
+  PRIMARY KEY(fh,dni), UNIQUE(fh,ninv));
+Error: near line 28: stepping, FOREIGN KEY constraint failed (19)
+1|100|2020-03-02 08:30-10:30
+2|200|2020-03-02 08:30-10:30
+Error: near line 34: stepping, FOREIGN KEY constraint failed (19)
+2|dp2
+5|dp2
+1|100|2020-03-02 08:30-10:30
+5|200|2020-03-02 08:30-10:30
+Error: near line 40: stepping, FOREIGN KEY constraint failed (19)
+
+sqlite> .tables
+evsup       maq         supervisio  tec 
+
+sqlite> SELECT * FROM evsup;
+2020-03-02 08:30-10:30
+sqlite> SELECT * FROM maq;
+200|SEAT
+sqlite> SELECT * FROM supervisio;
+1|100|2020-03-02 08:30-10:30
+5|200|2020-03-02 08:30-10:30
+sqlite> SELECT * FROM tec;
+ - 
+ 
+ *Exercicis 04python_sqlinjection:*
+ 
+
