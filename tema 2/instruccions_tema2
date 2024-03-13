@@ -127,4 +127,43 @@ codi CHAR(8) NOT NULL PRIMARY KEY,
 	nom ciutat VARCHAR(50) NOT NULL,
 	nom pais VARCHAR(20) NOT NULL,
 	FOREIGN KEY (nom ciutat, nom pais) REFERENCES ciutat);
+	
+
+DEPENDÈNCIES FUNCIONALS:
+
+DP: dades personals
+N.Inv: numero inventari - maquina
+FH: franja horària
+Fab: fabricant
+
+- DNI → D.P.
+- N.Inv. → Fab
+- DNI F.H. → N.Inv.
+- N.Inv. F.H. → DNI
+
+
+Variables:
+ * Periòdicament, tècnics competents supervisen cada màquina, possiblement en equip.
+- DNI → D.P.
+- N.Inv. → Fab
+- DNI F.H. → N.Inv.
+- N.Inv. F.H. /→ DNI (ja no es pot determinar un sol dni d'un sol fabricant pq ja no sera un sol revisant una màquina)
+cal treure la clau alternativa UNIQUE(fh,ninv), també està en BCNF i, per tant, en 3NF.
+
+
+* Cada màquina té assignat un tècnic, sempre el mateix, que, de manera individual, la supervisa.
+- DNI → D.P.
+- N.Inv. → Fab
+- DNI F.H. → N.Inv.
+- N.Inv. F.H. -/→ DNI
+- N.Inv.→ DNI (no cal saber la franja horària pq sempre sera el mateix fa tecninc que estarà associat en una màquina )
+
+* Cada màquina té assignat un tècnic, sempre el mateix, que, de manera individual, la supervisa setmanalment.
+- DNI → D.P.
+- N.Inv. → Fab
+- DNI F.H. → N.Inv.
+- N.Inv. F.H. -/→ DNI
+- N.Inv.→ DNI (no cal saber la franja horària pq sempre sera el mateix fa tecninc que estarà associat en una màquina )
+- N.Inv → FH  (per aixi tenir la franja horària que es supervisa la màquina)
+
 
