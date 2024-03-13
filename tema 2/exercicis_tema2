@@ -189,3 +189,38 @@ Dependències funcionals:
 4. una persona no té una única direcció sinó potser diverses (Personal, laboral, segona
 residència…) i a més en cadascuna d’elles pot haver-hi diversos telèfons
 
+
+2 Felicitacions d’aniversari
+El nostre amic John ara viu a Barcelona, però ha viscut en molts països i coneix moltes
+llengües, i té una enorme llista d’amics repartits per tot el món. Té una col·lecció de
+missatges de ’feliç aniversari’, curosament redactats perquè qualsevol missatge serveixi per
+a qualsevol persona, i va afegint nous missatges de tant en tant per repetir menys. Té
+muntat un sistema automàtic que envia un e-mail de felicitació d’aniversari el dia adequat
+a la persona adequada, tots els anys, triant aleatòriament el text del missatge.
+
+
+Missatge - M
+Persona - P
+Data aniversari - D
+Any - A
+Email - E
+
+P→D
+P A /→ M
+P A → E
+E → P , A ,M 
+
+Variants:
+1. John no vol repetir el mateix missatge mai a persones que visquin a la mateixa ciutat,
+ni tan sols en anys diferents.
+2. Darrerament John va escàs de temps per preparar nous missatges, i no obstant això la
+seva llista d’amigues està creixent bastant (igual és per això que va escàs de temps).
+Com John s’ha adonat que, d’un any per l’altre, gairebé ningú es recorda del missatge,
+no li importa repetir el mateix missatge a persones diferents de la mateixa ciutat però
+només si és en anys diferents.
+3. Cada amic de John coneix un o diversos idiomes; cada missatge pot tenir diverses
+versions, cada versió en un idioma. Per descomptat, John no enviarà un missatge
+escrit en una llengua a una persona que no coneix aquest idioma.
+
+
+
