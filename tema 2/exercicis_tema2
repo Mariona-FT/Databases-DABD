@@ -204,23 +204,67 @@ Persona - P
 Data aniversari - D
 Any - A
 Email - E
-
+Paisos - PA
+Idiomes - I
 P→D
 P A /→ M
 P A → E
 E → P , A ,M 
 
+=>finals:
+
+P→D
+P A → E
+E → P , A ,M 
+M → I
+
+
+R1(P, A) - PK:P
+R2(A) - PK:A
+R3(P, A, E, M) - PK:E , UK: P, A
+R4(M) - PK:M
+
 Variants:
 1. John no vol repetir el mateix missatge mai a persones que visquin a la mateixa ciutat,
 ni tan sols en anys diferents.
+
+Ciutat- C
+
+R1(P, A, C) - PK:P
+R2(E, M, P, A ) - PK:E , UK: P, A
+R3(M,I) - PK:M
+R4(M,I) - PK:M
+R5(PA)
+R6(I)
+
+==> Resultat
+R1(P,D)- PK:P
+R2(E,C,M,P,A)- PK:E , UK:C,M  UK: P,A
+	Combinació: Ciutat missatge - únic - no cal fer-ho en software
+	COmbinació: Persona any - únic - 
+R3(M,I)- PK:M
+
+=>finals variant:
+
+P→D,C
+P A → E
+E → P , A ,M 
+M → I
+M, C → E
+
 2. Darrerament John va escàs de temps per preparar nous missatges, i no obstant això la
 seva llista d’amigues està creixent bastant (igual és per això que va escàs de temps).
 Com John s’ha adonat que, d’un any per l’altre, gairebé ningú es recorda del missatge,
 no li importa repetir el mateix missatge a persones diferents de la mateixa ciutat però
 només si és en anys diferents.
+
 3. Cada amic de John coneix un o diversos idiomes; cada missatge pot tenir diverses
 versions, cada versió en un idioma. Per descomptat, John no enviarà un missatge
 escrit en una llengua a una persona que no coneix aquest idioma.
+
+
+
+--REIS MAGS I HOTELS
 
 
 
