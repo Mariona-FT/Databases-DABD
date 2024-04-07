@@ -1,0 +1,1248 @@
+Instruccions utilitzades en la sessió 1:
+p.0/13
+
+Instal·lar SQLite3
+	instruccions SQL acaben en ;
+	instruccions NO SQL precedides per . punt => .exit .databases .tables .schema
+			.mode .output .import . read
+
+Crear nou fitxer: sqlite fitxer.db == Obrir bades de dades 
+taula bàsica de contactes:
+
+sqlite> CREATE TABLE contactes (
+   ...> id INTEGER,
+   ...> firstname TEXT,
+   ...> lastname TEXT NOT NULL,
+   ...> email TEXT NOT NULL UNIQUE,
+   ...> PRIMARY KEY(id) 
+   ...> );
+sqlite> .tables
+contactes
+
+sqlite> INSERT INTO contactes VALUES(1,'ola','gonazalez','aa@gmail.com');
+sqlite> SELECT* FROM contactes;
+1|ola|gonazalez|aa@gmail.com
+
+borrar una taula:
+sqlite> DROP TABLE accounts;
+
+
+Crear taula accounts:
+sqlite> CREATE TABLE accounts (
+   ...> acc_id INTEGER,
+   ...> type CHAR(1),
+   ...> balance REAL,
+   ...> owner TEXT,
+   ...> owner_id INTEGER,
+   ...> phone INTEGER,
+   ...> address TEXT)
+   ...> ;
+
+importar valors del .txt a la taula:
+sqlite> .import accounts.txt accounts
+
+veure si s’han inserit correctament:
+sqlite> SELECT * FROM accounts;
+acc_id|type|balance|owner|owner_id|phone|address
+161320011440|P|1763.68|Tomé Cecial|6463525|223242|Camino de Criptana 2, Argamasilla
+161320011440|P|1763.68|Sancho Panza|6532345|222333|Corrales s/n, Argamasilla
+111930116980|C|1564.27|Álvaro Tarfe|6112452|334455|Avellaneda 2, Granada
+
+crear taules +inserir des de .sql:
+ sqlite3 accounts2.db < accounts.sql 
+
+Consultes:
+bd: accounts
+types : acc_id|type|balance|owner|owner_id|phone|address
+tots dnis i únic:  
+	sqlite> SELECT DISTINCT owner_id FROM accounts;
+
+dni persona en particular:  
+	sqlite> SELECT owner_id FROM accounts WHERE owner ='Pedro Alonso';
+6564321
+6564321
+
+comptes saldo superior 1000:  
+	sqlite> SELECT owner FROM accounts WHERE balance <1000;
+Caballero de los Espejos
+Pedro Alonso
+Roque Guinart
+
+Comptes q no son tipus L: 
+	sqlite> SELECT  acc_id,owner,type FROM accounts WHERE type !='L';
+161320011440|Tomé Cecial|P
+161320011440|Sancho Panza|P
+111930116980|Álvaro Tarfe|C
+134300219657|Sancho de Azpetia|C
+
+Saldo disponible per cadascun titulars (sumant comptes )sense repeticions: 
+	sqlite> SELECT owner,balance, SUM(balance) AS total_balance FROM accounts GROUP BY owner_id;
+Ginés de Pasamonte|1551.99|11624.81
+Vivaldo Cachopín|1243.68|1243.68
+Sancho de Azpetia|1438.91|4139.06
+
+nom i telf sense repeticions dni del alonso quijano (subquerys): 
+	sqlite> SELECT DISTINCT owner, phone FROM accounts WHERE owner_id = (SELECT owner_id FROM accounts WHERE owner = 'Alonso Quijano' LIMIT 1);
+Alonso Quijano|213243
+Caballero de la Triste Figura|213243
+
+
+*parells noms mateixa persona,dni, sense repeticions( joins 5tuples):*
+
+Compte saldo major: 
+	sqlite> SELECT * FROM  accounts ORDER BY balance DESC LIMIT 1;
+119774916201|C|9818.59|Alonso López|6656223|292827|Camino Alcobendas 10, Baeza
+
+Compte saldo menor:
+	sqlite> SELECT * FROM accounts WHERE balance > 0 ORDER BY balance ASC LIMIT 1;
+171174310952|C|28.89|Caballero de la Blanca Luna|6435323|234678|Mayor 11, Argamasilla
+
+	Nom titulars sense repeticions comencen amb "Caballero de":
+sqlite> SELECT DISTINCT owner FROM accounts WHERE  owner LIKE 'Caballero de%' ;
+owner
+Caballero de los Espejos
+Caballero del Verde Gabán
+Caballero de la Triste Figura
+Caballero de la Blanca Luna
+
+	Titular que té el major saldo sumant tots els seus comptes (és el 6435323 amb 17351.02 eur):
+SELECT owner_id, SUM(balance) AS total_balance FROM accounts GROUP BY owner_id ORDER BY total_balance DESC LIMIT 1;
+owner_id|total_balance
+6435323|17351.02
+
+
+	Titular que té el menor saldo sumant tots els seus comptes (és el 6152436 amb 687.78 eur): 
+SELECT owner_id, SUM(balance) AS total_balance FROM accounts GROUP BY owner_id ORDER BY total_balance ASC LIMIT 1;
+owner_id|total_balance
+6152436|687.78
+
+
+ 	Saldo total i saldo mig de tots els comptes del banc arrodonit a 2 decimals (106118.38 eur i 2210.80 eur respectivament):
+sqlite> SELECT ROUND(SUM(balance), 2) AS total_balance, ROUND(AVG(balance), 2) AS average_balance FROM accounts;
+total_balance|average_balance
+141079.78|2239.36
+
+	DNI de tots els titulars, sense repeticions, amb el número de comptes que té cada titular:
+
+	Llistat amb el número de titulars amb un compte, número de titulars amb dos comptes, ... (Ha de donar 1—8, 2—4, 3—10, 4—1, 6—1, 7—1):
+
+sqlite> WITH Counts AS (
+  SELECT owner_id, COUNT(*) AS num_accounts
+  FROM accounts
+  GROUP BY owner_id
+)
+SELECT num_accounts, COUNT(*) AS number_of_owners
+FROM Counts
+GROUP BY num_accounts
+ORDER BY num_accounts;
+num_accounts|number_of_owners
+1|8
+2|4
+3|10
+4|1
+6|1
+7|1
+
+	Comptes, sense repeticions, amb el número de titulars que té cada compte:
+sqlite> SELECT acc_id , COUNT (owner_id) AS number_of_o 
+   ...> FROM accounts
+   ...> GROUP BY owner_id;
+acc_id|number_of_o
+155432214678|3
+183384214435|1
+134300219657|3
+111930116980|2
+101790319782|3
+122812616034|1
+185121112058|3
+198270715673|1
+108210513275|7
+
+/**********************************************************************/
+Instruccions utilitzades en la sessió 2:
+p.13 / 22
+
+*** MYSQL: ***
+
+Connectar-se al ubiwan utilitzant l'usuari: ssg userubiwan@ubiwan.epsevg.upc.edu
+
+Entrar a les mysql del servidor : mysql -u est_userubiwan -p
+Enter password:  dB.userubiwan
+
+Mirar databases: 
+mysql> show databases;
++--------------------+
+| Database           |
++--------------------+
+| est_userubiw       |
+| information_schema |
+| performance_schema |
++--------------------+
+3 rows in set (0.00 sec)
+
+entrar a la base de dades del usuari:
+mysql> \u est_userubiwan
+
+Mirar taules dins de la base de dades:
+mysql> show tables;
+
+Mirar ESQUEMA taula:
+mysql> desc pets;
++-----------+------+------+-----+---------+-------+
+| Field     | Type | Null | Key | Default | Extra |
++-----------+------+------+-----+---------+-------+
+| nom       | text | YES  |     | NULL    |       |
+| data_naix | int  | YES  |     | NULL    |       |
+| tipus     | text | YES  |     | NULL    |       |
+| pes       | int  | YES  |     | NULL    |       |
++-----------+------+------+-----+---------+-------+
+4 rows in set (0.00 sec)
+
+Crear taula de mascotes:
+mysql> CREATE TABLE pets ( nom TEXT, data_naix INTEGER, tipus TEXT, pes INTEGER);
+Query OK, 0 rows affected (0.07 sec)
+
+Insertar varies mascotes de gats i gossos:
+mysql> INSERT INTO pets VALUES('lola',120802,'gos',15);
+mysql> INSERT INTO pets VALUES('perry',040810,'cavall',78);
+mysql> INSERT INTO pets VALUES('cutie',021201,'gat',7);
+mysql> INSERT INTO pets VALUES('po',021207,'gat',13);
+mysql> INSERT INTO pets VALUES('nina',040707,'gos',11);
+mysql> INSERT INTO pets VALUES('taques',031022,'gos',8);
+
+Consultes bàsiques:
+mysql> SELECT nom,tipus FROM pets WHERE tipus='gat';
++-------+-------+
+| nom   | tipus |
++-------+-------+
+| cutie | gat   |
+| po    | gat   |
++-------+-------+
+
+mysql> SELECT nom,tipus FROM pets WHERE tipus='gos';
++--------+-------+
+| nom    | tipus |
++--------+-------+
+| lola   | gos   |
+| nina   | gos   |
+| taques | gos   |
++--------+-------+
+
+Fer un update del pes d'un gat:
+
+mysql> SELECT nom,tipus,pes FROM pets WHERE tipus='gat';
++-------+-------+------+
+| nom   | tipus | pes  |
++-------+-------+------+
+| cutie | gat   |    7 |
+| po    | gat   |   13 |
++-------+-------+------+
+2 rows in set (0.00 sec)
+
+mysql> UPDATE pets SET pes=10 WHERE nom='cutie';
+Query OK, 1 row affected (0.01 sec)
+Rows matched: 1  Changed: 1  Warnings: 0
+
+mysql> SELECT nom,tipus,pes FROM pets WHERE tipus='gat';
++-------+-------+------+
+| nom   | tipus | pes  |
++-------+-------+------+
+| cutie | gat   |   10 |
+| po    | gat   |   13 |
++-------+-------+------+
+2 rows in set (0.00 sec)
+
+Eliminar un gos que ha passat a una altra vida:
+
+mysql> DELETE FROM pets WHERE nom=taques;
+ERROR 1054 (42S22): Unknown column 'taques' in 'where clause'
+mysql> DELETE FROM pets WHERE nom='taques';
+Query OK, 1 row affected (0.02 sec)
+
+mysql> SELECT nom,tipus FROM pets WHERE tipus='gos';
++------+-------+
+| nom  | tipus |
++------+-------+
+| lola | gos   |
+| nina | gos   |
++------+-------+
+2 rows in set (0.00 sec)
+
+Create view de nomes gossos:
+
+mysql> CREATE VIEW view_gossos AS SELECT nom,tipus,data_naix FROM pets WHERE tipus='gos' ; 
+Query OK, 0 rows affected (0.02 sec)
+
+mysql> SELECT * FROM view_gossos;
++------+-------+-----------+
+| nom  | tipus | data_naix |
++------+-------+-----------+
+| lola | gos   |    120802 |
+| nina | gos   |     40707 |
++------+-------+-----------+
+2 rows in set (0.00 sec)
+
+
+Create view de la mitjana dels pesos per tipus de mascota:
+
+mysql> CREATE VIEW view_average_pets AS SELECT tipus,AVG(pes) AS mitjana FROM pets GROUP BY tipus;
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> SELECT *  FROM view_average_pets;
++--------+---------+
+| tipus  | mitjana |
++--------+---------+
+| gos    | 13.0000 |
+| cavall | 78.0000 |
+| gat    | 11.5000 |
++--------+---------+
+3 rows in set (0.00 sec)
+
+Seleccionar una caracteristica de una vista:
+
+mysql> SELECT mitjana  FROM view_average_pets;
++---------+
+| mitjana |
++---------+
+| 13.0000 |
+| 78.0000 |
+| 11.5000 |
++---------+
+3 rows in set (0.00 sec)
+
+Eliminar una vista:
+
+mysql> DROP VIEW view_average_pets;
+Query OK, 0 rows affected (0.01 sec)
+
+
+*** IMPORTAR I EXPORTAR MYSQL: ***
+
+IMPORTAR fitxers a mysql:
+-> entrar a ubiwan
+-> fitxer a importar en ubiwan
+mysql -u est_userubi -p est_userubi < accounts.sql 
+Enter password: dB.userubi
+(en el cas accounts error int acc_id fora de rang -> canviar a bigint)
+
+mysql> show tables;
++------------------------+
+| Tables_in_est_userubiw |
++------------------------+
+| accounts               |
+| p                      |
+| pets                   |
+| view_average           |
+| view_gossos            |
++------------------------+
+5 rows in set (0.00 sec)
+
+EXPORTAR fitxer de mysql:
+-> tenir la taula que es vulgui importar a mysql creada
+ mysqldump -u est_userubi -p est_userubi pets > datapets.sql --column-statistics=0 --no-tablespaces
+Enter password: dB.userubi
+(mysqldump -u username -p databasename pets --no-tablespaces --compatible=ansi > pets.sql
+)
+ub@ubiwan:~$ ls
+ DABD   PROP   a.wav          datapets.sql                         
+ INTE   REIN   accounts.sql  'datapets.sql--column-statistics=0'   fotos
+ MIDA   XAMU   assignatures   elasticsearch-data
+
+
+*** POSTGRESQL: ***
+Connectar-se al ubiwan utilitzant l'usuari: ssg userubiwan@ubiwan.epsevg.upc.edu
+
+ubi@ubiwan:~$ psql -h ubiwan.epsevg.upc.edu -U est_userubi -W
+Password: dB.userubi
+
+psql (12.18 (Ubuntu 12.18-0ubuntu0.20.04.1))
+SSL connection (protocol: TLSv1.3, cipher: TLS_AES_256_GCM_SHA384, bits: 256, compression: off)
+Type "help" for help.
+
+(Ja estarem a la nostra base de dades)
+=> \l mostra les bases de dades
+=> \c canviar de bases de dades
+=> \d  mostra les taules
+=> \d table/view esquema de la taula
+
+Crear taula de pelicules:
+=> CREATE TABLE movies (
+name TEXT,
+year INT,
+director TEXT,
+score INT);
+
+Insertar varies pelicules del Stanley Kubrik i Quentin Tarnantino
+INSERT INTO movies VALUES ('the shining',1980,'Stanley Kubrick',8);
+=> INSERT INTO movies VALUES ('2001 a space odyssey',1968,'Stanley Kubrick',9);
+=> INSERT INTO movies VALUES ('Operation Lune',2002,'Stanley Kubrick',7);
+=> INSERT INTO movies VALUES ('Room 237',2012,'Stanley Kubrick',6);
+=> INSERT INTO movies VALUES ('The hateful eight',2015,'Quentin Tarantino',8);
+=> INSERT INTO movies VALUES ('Pulp Fiction',1994,'Quentin Tarantino',9);
+=> INSERT INTO movies VALUES ('Once upon a time in hollywood',2019,'Quentin Tarantino',7);
+=> INSERT INTO movies VALUES ('Jackie Brown',1997,'Quentin Tarantino',8);
+=> INSERT INTO movies VALUES ('From dusk till dawn',1996,'Quentin Tarantino',7);
+
+Esquema taula:
+=> \d movies 
+                Table "public.movies"
+  Column  |  Type   | Collation | Nullable | Default 
+----------+---------+-----------+----------+---------
+ name     | text    |           |          | 
+ year     | integer |           |          | 
+ director | text    |           |          | 
+ score    | integer |           |          | 
+
+=> SELECT * FROM movies;
+             name              | year |     director      | score 
+-------------------------------+------+-------------------+-------
+ the shining                   | 1980 | Stanley Kubrick   |     8
+ 2001 a space odyssey          | 1968 | Stanley Kubrick   |     9
+ Operation Lune                | 2002 | Stanley Kubrick   |     7
+ Room 237                      | 2012 | Stanley Kubrick   |     6
+ The hateful eight             | 2015 | Quentin Tarantino |     8
+ Pulp Fiction                  | 1994 | Quentin Tarantino |     9
+ Once upon a time in hollywood | 2019 | Quentin Tarantino |     7
+ Jackie Brown                  | 1997 | Quentin Tarantino |     8
+ From dusk till dawn           | 1996 | Quentin Tarantino |     7
+(9 rows)
+
+Consultes:
+Ordenades per director ascendent;
+SELECT * FROM movies ORDER BY director ASC;
+             name              | year |     director      | score 
+-------------------------------+------+-------------------+-------
+ From dusk till dawn           | 1996 | Quentin Tarantino |     7
+ The hateful eight             | 2015 | Quentin Tarantino |     8
+ Pulp Fiction                  | 1994 | Quentin Tarantino |     9
+ Once upon a time in hollywood | 2019 | Quentin Tarantino |     7
+ Jackie Brown                  | 1997 | Quentin Tarantino |     8
+ 2001 a space odyssey          | 1968 | Stanley Kubrick   |     9
+ Operation Lune                | 2002 | Stanley Kubrick   |     7
+ Room 237                      | 2012 | Stanley Kubrick   |     6
+ the shining                   | 1980 | Stanley Kubrick   |     8
+(9 rows)
+
+=> SELECT * FROM movies ORDER BY director DESC;
+             name              | year |     director      | score 
+-------------------------------+------+-------------------+-------
+ the shining                   | 1980 | Stanley Kubrick   |     8
+ 2001 a space odyssey          | 1968 | Stanley Kubrick   |     9
+ Operation Lune                | 2002 | Stanley Kubrick   |     7
+ Room 237                      | 2012 | Stanley Kubrick   |     6
+ The hateful eight             | 2015 | Quentin Tarantino |     8
+ Pulp Fiction                  | 1994 | Quentin Tarantino |     9
+ Once upon a time in hollywood | 2019 | Quentin Tarantino |     7
+ Jackie Brown                  | 1997 | Quentin Tarantino |     8
+ From dusk till dawn           | 1996 | Quentin Tarantino |     7
+(9 rows)
+
+Les del mateix director per puntuació descendent:
+=> SELECT m.*  FROM movies m WHERE m.score= (SELECT MIN(m2.score) FROM movies m2  WHERE m2.director=m.director)
+;
+             name              | year |     director      | score 
+-------------------------------+------+-------------------+-------
+ Room 237                      | 2012 | Stanley Kubrick   |     6
+ Once upon a time in hollywood | 2019 | Quentin Tarantino |     7
+ From dusk till dawn           | 1996 | Quentin Tarantino |     7
+(3 rows)
+
+=> SELECT m.*  FROM movies m WHERE m.score= (SELECT MAX(m2.score) FROM movies m2  WHERE m2.director=m.director)
+;
+         name         | year |     director      | score 
+----------------------+------+-------------------+-------
+ 2001 a space odyssey | 1968 | Stanley Kubrick   |     9
+ Pulp Fiction         | 1994 | Quentin Tarantino |     9
+(2 rows)
+
+Create view mitjana de puntuació per director:
+CREATE VIEW view_average_score AS SELECT director,AVG(score) AS average FROM movies GROUP BY director;
+CREATE VIEW
+=> SELECT * FROM view_average_score;
+     director      |      average       
+-------------------+--------------------
+ Quentin Tarantino | 7.8000000000000000
+ Stanley Kubrick   | 7.5000000000000000
+(2 rows)
+
+mitjana any per director:
+=> CREATE VIEW view_average_year AS SELECT director,AVG(year) AS average FROM movies GROUP BY director;
+CREATE VIEW
+=> SELECT * FROM view_average_year;
+     director      |        average        
+-------------------+-----------------------
+ Quentin Tarantino | 2004.2000000000000000
+ Stanley Kubrick   | 1990.5000000000000000
+(2 rows)
+
+any de la primera pelicula de cada director:
+ CREATE VIEW view_first_year AS SELECT director,MIN(year) AS min_year FROM movies GROUP BY director;
+CREATE VIEW
+=> SELECT * FROM view_first_year;
+     director      | min_year 
+-------------------+----------
+ Quentin Tarantino |     1994
+ Stanley Kubrick   |     1968
+(2 rows)
+
+Actualitzar valor de puntuació:
+=> SELECT * FROM movies;
+             name              | year |     director      | score 
+-------------------------------+------+-------------------+-------
+ the shining                   | 1980 | Stanley Kubrick   |     8
+ 2001 a space odyssey          | 1968 | Stanley Kubrick   |     9
+ Operation Lune                | 2002 | Stanley Kubrick   |     7
+ Room 237                      | 2012 | Stanley Kubrick   |     6
+ The hateful eight             | 2015 | Quentin Tarantino |     8
+ Pulp Fiction                  | 1994 | Quentin Tarantino |     9
+ Once upon a time in hollywood | 2019 | Quentin Tarantino |     7
+ Jackie Brown                  | 1997 | Quentin Tarantino |     8
+ From dusk till dawn           | 1996 | Quentin Tarantino |     7
+(9 rows)
+
+=> UPDATE movies SET score=10 WHERE name='Pulp Fiction';
+UPDATE 1
+=> SELECT * FROM movies;
+             name              | year |     director      | score 
+-------------------------------+------+-------------------+-------
+ the shining                   | 1980 | Stanley Kubrick   |     8
+ 2001 a space odyssey          | 1968 | Stanley Kubrick   |     9
+ Operation Lune                | 2002 | Stanley Kubrick   |     7
+ Room 237                      | 2012 | Stanley Kubrick   |     6
+ The hateful eight             | 2015 | Quentin Tarantino |     8
+ Once upon a time in hollywood | 2019 | Quentin Tarantino |     7
+ Jackie Brown                  | 1997 | Quentin Tarantino |     8
+ From dusk till dawn           | 1996 | Quentin Tarantino |     7
+ Pulp Fiction                  | 1994 | Quentin Tarantino |    10
+(9 rows)
+
+*** IMPORTAR I EXPORTAR POSTGRESQL: ***
+
+IMPORTAR sql en postgre:
+
+-> entrar a ubiwan
+-> tenir la sql en la mateixa carpeta q l'execució
+userubiwan@ubiwan:~$ psql -h ubiwan.epsevg.upc.edu  -U est_userubiwan est_userubiwan -f accounts.sql 
+
+En postgre:
+-> \d
+                 List of relations
+ Schema |        Name        | Type  |    Owner     
+--------+--------------------+-------+--------------
+ public | accounts           | table | 
+ public | movies             | table | 
+ public | view_average_score | view  | 
+ public | view_average_year  | view  | 
+ public | view_first_year    | view  | 
+(5 rows)
+
+EXPORTAR sql en postgre:
+-> entrar a ubiwan
+-> posar totes les opcions seguents per possibles problemes d'incompatibilitat:
+	--no-tablespaces--no-owner --no-acl --column-inserts
+	
+userubiwan@ubiwan:~$ pg_dump -h ubiwan.epsevg.upc.edu -U est_userubiwan est_userubiwan -t movies > datamovies.sql --no-tablespaces --no-owner
+Password: dB.userubiwan
+
+En ubiwan: 
+userubiwan@ubiwan:~$ ls
+ DABD   MIDA   REIN   accounts.sql   datamovies.sql  'datapets.sql--column-statistics=0'   elasticsearch-logs
+ INTE   PROP   XAMU   assignatures   datapets.sql     elasticsearch-data                   fotos
+
+EXPORTAR LA TAULA DE MOVIES.SQL I IMPORTAR-LES A MYSQL:
+
+Exportar en postgre:
+
+userubiwan@ubiwan:~$ pg_dump -h ubiwan.epsevg.upc.edu -U est_userubiwan est_userubiwan
+-t movies --no-tablespaces --no-owner --no-acl --column-inserts  > datamovie.sql
+Password: dB.userubiwan
+
+En ubiwan: 
+userubiwan@ubiwan:~$ ls
+ DABD   MIDA   REIN   accounts.sql   datamovie.sql  'datapets.sql--column-statistics=0'   elasticsearch-logs
+ INTE   PROP   XAMU   assignatures   datapets.sql     elasticsearch-data                   fotos
+ 
+Importar en mysql:
+
+-> Treure MANUALMENT en el .sql 
+	- TOTES les lines de SET time (comentar-les)
+	- TOTS ELS public. del CREATE i INSERT 
+ara ja serà compatible amb mysql:
+userubiwan@ubiwan:~$ mysql -h ubiwan.epsevg.upc.edu -u est_userubiwan -p est_userubiwan <  datamovie.sql 
+Enter password: dB.userubiwan
+
+mysql> show tables;
++------------------------+
+| Tables_in_est_userubiw |
++------------------------+
+| accounts               |
+| movies                 |
+| p                      |
+| pets                   |
+| view_average           |
+| view_gossos            |
++------------------------+
+6 rows in set (0.00 sec)
+
+
+/ **INFORMATION SCHEMA ** /
+MYSQL:
+
+Sortir de la meva base de dades - entrar a information_shema
+mysql> \u information_schema
+
+mysql> SELECT table_name, column_name, column_type  FROM columns WHERE table_name='accounts';
++------------+-------------+--------------+
+| TABLE_NAME | COLUMN_NAME | COLUMN_TYPE  |
++------------+-------------+--------------+
+| accounts   | acc_id      | bigint       |
+| accounts   | type        | char(1)      |
+| accounts   | balance     | double       |
+| accounts   | owner       | varchar(40)  |
+| accounts   | owner_id    | int          |
+| accounts   | phone       | int          |
+| accounts   | address     | varchar(100) |
++------------+-------------+--------------+
+7 rows in set (0.00 sec)
+
+
+POSTGRESQL:
+est_userubu=> SELECT udt_catalog, column_name, udt_name FROM information_schema.columns WHERE table_name='accounts';
+ udt_catalog  | column_name | udt_name 
+--------------+-------------+----------
+ est_userubiw | acc_id      | int8
+ est_userubiw | type        | bpchar
+ est_userubiw | balance     | float4
+ est_userubiw | owner       | varchar
+ est_userubiw | owner_id    | int4
+ est_userubiw | phone       | int4
+ est_userubiw | address     | varchar
+(7 rows)
+
+
+ 
+ INSTAL·LAR:
+ - msql:  sudo apt install mysql-client-core-8.0
+ - aplicació msql workbench per connectar-se remotament en les bd
+/**********************************************************************/
+Instruccions utilitzades en la sessió 3:
+p.22 / 26
+
+/ **INFORMATION SCHEMA ** /
+MYSQL:
+
+Sortir de la meva base de dades - entrar a information_shema
+mysql> \u information_schema
+
+mysql> SELECT table_name, column_name, column_type  FROM columns WHERE table_name='accounts';
++------------+-------------+--------------+
+| TABLE_NAME | COLUMN_NAME | COLUMN_TYPE  |
++------------+-------------+--------------+
+| accounts   | acc_id      | bigint       |
+| accounts   | type        | char(1)      |
+| accounts   | balance     | double       |
+| accounts   | owner       | varchar(40)  |
+| accounts   | owner_id    | int          |
+| accounts   | phone       | int          |
+| accounts   | address     | varchar(100) |
++------------+-------------+--------------+
+7 rows in set (0.00 sec)
+
+POSTGRESQL:
+est_userubu=> SELECT udt_catalog, column_name, udt_name FROM information_schema.columns WHERE table_name='accounts';
+ udt_catalog  | column_name | udt_name 
+--------------+-------------+----------
+ est_userubiw | acc_id      | int8
+ est_userubiw | type        | bpchar
+ est_userubiw | balance     | float4
+ est_userubiw | owner       | varchar
+ est_userubiw | owner_id    | int4
+ est_userubiw | phone       | int4
+ est_userubiw | address     | varchar
+(7 rows)
+
+Normalització:
+
+dni-> nom
+nom -/-> dni
+
+                      Table "public.accounts"
+  Column  |          Type          | Collation | Nullable | Default 
+----------+------------------------+-----------+----------+---------
+ acc_id   | bigint                 |           |          | 
+ type     | character(1)           |           |          | 
+ balance  | real                   |           |          | 
+ owner    | character varying(40)  |           |          | 
+ owner_id | integer                |           |          | 
+ phone    | integer                |           |          | 
+ address  | character varying(100) |           |          | 
+
+ nom taules:
+ R1: titulars (owner_id,address) PK: owner_id  FK: adress=Adreces.address
+ R2: adreces (address,phone)  PK: address, UNIQUEK:phone
+ R3: comptes (acc_id, balance,type)  PK: acc_id
+ R4: contractes (acc_id, owner_id,owner) PK:acc_id, owner_id FK: acc_id=Comptes.acc_id, 
+ 								owner_id=titulars.owner_id
+Crear les taules en postgreSQL:
+
+=> CREATE TABLE comptes (
+acc_id bigint PRIMARY KEY NOT NULL,
+balance real,
+type character(1) NOT NULL);
+CREATE TABLE
+
+=> CREATE TABLE adreces(
+address VARCHAR(100) PRIMARY KEY NOT NULL,
+phone INT UNIQUE NOT NULL);
+CREATE TABLE
+
+=> CREATE TABLE titulars (
+owner_id INT PRIMARY KEY NOT NULL,
+address VARCHAR(100) NOT NULL, FOREIGN KEY (address) REFERENCES adreces(address));
+CREATE TABLE
+
+(falta posar polítiques d'actualització i borrar:  ON UPDATE CASCADE ON DELETE SET NULL )
+=> CREATE TABLE titulars (
+    owner_id INT PRIMARY KEY NOT NULL,
+    address VARCHAR(100) NOT NULL,
+    FOREIGN KEY (address) REFERENCES adreces(address) ON UPDATE CASCADE ON DELETE SET NULL
+);
+
+=> CREATE TABLE contractes (
+acc_id BIGINT NOT NULL, owner_id INT NOT NULL,
+owner VARCHAR(40) NOT NULL, PRIMARY KEY(acc_id, owner_id),FOREIGN KEY (owner_id) REFERENCES titulars(owner_id), FOREIGN KEY (acc_id) REFERENCES comptes(acc_id));
+CREATE TABLE
+
+(falta posar polítiques d'actualització i borrar:  ON UPDATE CASCADE ON DELETE SET NULL )
+CREATE TABLE contractes (
+    acc_id BIGINT NOT NULL,
+    owner_id INT NOT NULL,
+    owner VARCHAR(40) NOT NULL,
+    PRIMARY KEY(acc_id, owner_id),
+    FOREIGN KEY (owner_id) REFERENCES titulars(owner_id) ON UPDATE CASCADE ON DELETE SET NULL,
+    FOREIGN KEY (acc_id) REFERENCES comptes(acc_id) ON UPDATE CASCADE ON DELETE SET NULL
+);
+
+Mirar la info de les taules:
+
+=> \d titulars;
+                      Table "public.titulars"
+  Column  |          Type          | Collation | Nullable | Default 
+----------+------------------------+-----------+----------+---------
+ owner_id | integer                |           | not null | 
+ address  | character varying(100) |           | not null | 
+Indexes:
+    "titulars_pkey" PRIMARY KEY, btree (owner_id)
+Foreign-key constraints:
+    "titulars_address_fkey" FOREIGN KEY (address) REFERENCES adreces(address)
+Referenced by:
+    TABLE "contractes" CONSTRAINT "contractes_owner_id_fkey" FOREIGN KEY (owner_id) REFERENCES titulars(owner_id)
+
+=> \d contractes
+                     Table "public.contractes"
+  Column  |         Type          | Collation | Nullable | Default 
+----------+-----------------------+-----------+----------+---------
+ acc_id   | bigint                |           | not null | 
+ owner_id | integer               |           | not null | 
+ owner    | character varying(40) |           | not null | 
+Indexes:
+    "contractes_pkey" PRIMARY KEY, btree (acc_id, owner_id)
+Foreign-key constraints:
+    "contractes_acc_id_fkey" FOREIGN KEY (acc_id) REFERENCES comptes(acc_id)
+    "contractes_owner_id_fkey" FOREIGN KEY (owner_id) REFERENCES titulars(owner_id)
+
+=> \d adreces;
+                      Table "public.adreces"
+ Column  |          Type          | Collation | Nullable | Default 
+---------+------------------------+-----------+----------+---------
+ address | character varying(100) |           | not null | 
+ phone   | integer                |           | not null | 
+Indexes:
+    "adreces_pkey" PRIMARY KEY, btree (address)
+    "adreces_phone_key" UNIQUE CONSTRAINT, btree (phone)
+Referenced by:
+    TABLE "titulars" CONSTRAINT "titulars_address_fkey" FOREIGN KEY (address) REFERENCES adreces(address)
+
+=> \d comptes;
+                 Table "public.comptes"
+ Column  |     Type     | Collation | Nullable | Default 
+---------+--------------+-----------+----------+---------
+ acc_id  | bigint       |           | not null | 
+ balance | real         |           |          | 
+ type    | character(1) |           | not null | 
+Indexes:
+    "comptes_pkey" PRIMARY KEY, btree (acc_id)
+Referenced by:
+    TABLE "contractes" CONSTRAINT "contractes_acc_id_fkey" FOREIGN KEY (acc_id) REFERENCES comptes(acc_id)
+
+Inserts en les taules:
+
+=> INSERT INTO adreces (address, phone) SELECT DISTINCT address, phone FROM accounts;
+INSERT 0 23
+
+=> INSERT INTO comptes (acc_id,balance,type) SELECT DISTINCT acc_id, balance,type FROM accounts;
+INSERT 0 48
+
+=> INSERT INTO titulars (owner_id, address) SELECT DISTINCT owner_id,address FROM accounts;
+INSERT 0 25
+
+=> INSERT INTO contractes (acc_id, owner_id, owner) SELECT DISTINCT acc_id,owner_id,owner FROM accounts;
+INSERT 0 63
+
+
+POSAR POLITIQUES ON UPDATE I ON DELETE FOREIGN KEYS:
+
+TITULARS:
+=> CREATE TABLE titulars (
+owner_id INT PRIMARY KEY NOT NULL,
+address VARCHAR(100) NOT NULL, FOREIGN KEY (address) REFERENCES adreces(address));
+CREATE TABLE
+
+=> ALTER TABLE titulars DROP CONSTRAINT titulars_address_fkey;
+ALTER TABLE
+=> alter table titulars add constraint titulars_address_fkey foreign key (address) references adreces(address) on update cascade on delete set null;
+ALTER TABLE
+
+
+CONTRACTES:
+=> CREATE TABLE contractes (
+acc_id BIGINT NOT NULL, owner_id INT NOT NULL,
+owner VARCHAR(40) NOT NULL, PRIMARY KEY(acc_id, owner_id),FOREIGN KEY (owner_id) REFERENCES titulars(owner_id), FOREIGN KEY (acc_id) REFERENCES comptes(acc_id));
+CREATE TABLE
+
+=> ALTER TABLE contractes DROP CONSTRAINT contractes_acc_id_fkey;
+ALTER TABLE
+=> ALTER TABLE contractes DROP CONSTRAINT contractes_owner_id_fkey;
+ALTER TABLE
+
+=> ALTER TABLE contractes ADD CONSTRAINT contractes_acc_id_fkey foreign key (acc_id) REFERENCES comptes(acc_id) on update cascade on delete set null;
+ALTER TABLE
+=> ALTER TABLE contractes ADD CONSTRAINT contractes_owner_id_fkey foreign key (owner_id) REFERENCES titulars(owner_id) on update cascade on delete set null;
+ALTER TABLE
+
+
+taules actualitzades:
+
+=> \d titulars;
+                      Table "public.titulars"
+  Column  |          Type          | Collation | Nullable | Default 
+----------+------------------------+-----------+----------+---------
+ owner_id | integer                |           | not null | 
+ address  | character varying(100) |           | not null | 
+Indexes:
+    "titulars_pkey" PRIMARY KEY, btree (owner_id)
+Foreign-key constraints:
+    "titulars_address_fkey" FOREIGN KEY (address) REFERENCES adreces(address) ON UPDATE CASCADE ON DELETE SET NULL
+Referenced by:
+    TABLE "contractes" CONSTRAINT "contractes_owner_id_fkey" FOREIGN KEY (owner_id) REFERENCES titulars(owner_id) ON UPDATE CASCADE ON DELETE SET NULL
+
+
+=> \d contractes;
+                     Table "public.contractes"
+  Column  |         Type          | Collation | Nullable | Default 
+----------+-----------------------+-----------+----------+---------
+ acc_id   | bigint                |           | not null | 
+ owner_id | integer               |           | not null | 
+ owner    | character varying(40) |           | not null | 
+Indexes:
+    "contractes_pkey" PRIMARY KEY, btree (acc_id, owner_id)
+Foreign-key constraints:
+    "contractes_acc_id_fkey" FOREIGN KEY (acc_id) REFERENCES comptes(acc_id) ON UPDATE CASCADE ON DELETE SET NULL
+    "contractes_owner_id_fkey" FOREIGN KEY (owner_id) REFERENCES titulars(owner_id) ON UPDATE CASCADE ON DELETE SET NULL
+/********************************************************************/
+Instruccions utilitzades en la sessió 4:
+p.27 / 36
+
+descarregar les seguents carpetes en ubiwan:
+- dins de ubiwan!
+$ cd /home/public/dabd/
+
+copiar i posar en el nostre usuari:
+u@ubiwan:/home/public/dabd$ cp -r 03claus_foranees/ /home/est/userubi/DABD/
+u@ubiwan:/home/public/dabd$ cp -r 04python_sqlinjection/ /home/est/userubi/DABD/
+
+
+*Exercicis 03claus_foranees:*
+
+Per utilitzar el sqlite millor descarregar-ho en local:
+
+Crear una base de dades per la .sql:
+
+DABD/laboratori/sessio 4/03claus_foranees$ sqlite3 fabrica.db
+SQLite version 3.37.2 2022-01-06 13:25:41
+Enter ".help" for usage hints.
+
+Indicar que es poden utilitzar claus foranes:
+sqlite> PRAGMA foreign keys = ON;
+
+Llegir el .sql dins de la base de dades creada:
+
+sqlite> .read maqfact_foreign_keys.sql
+Error: near line 13: in prepare, table tec already exists (1)
+Error: near line 14: in prepare, table maq already exists (1)
+Error: near line 15: in prepare, table evsup already exists (1)
+Error: near line 16: in prepare, table supervisio already exists (1)
+CREATE TABLE tec (dni int NOT NULL, dp text, PRIMARY KEY(dni));
+CREATE TABLE maq (ninv int NOT NULL, fab text, PRIMARY KEY(ninv));
+CREATE TABLE evsup (fh text NOT NULL, PRIMARY KEY(fh));
+CREATE TABLE supervisio (
+  dni int NOT NULL,
+  ninv int NOT NULL,
+  fh text NOT NULL,
+  FOREIGN KEY (dni) REFERENCES tec ON UPDATE CASCADE, 
+  FOREIGN KEY (ninv) REFERENCES maq ON UPDATE CASCADE,
+  FOREIGN KEY (fh) REFERENCES evsup ON UPDATE CASCADE,
+  PRIMARY KEY(fh,dni), UNIQUE(fh,ninv));
+CREATE TABLE supervisio (
+  dni int NOT NULL,
+  ninv int NOT NULL,
+  fh text NOT NULL,
+  FOREIGN KEY (dni) REFERENCES tec ON UPDATE CASCADE, 
+  FOREIGN KEY (ninv) REFERENCES maq ON UPDATE CASCADE,
+  FOREIGN KEY (fh) REFERENCES evsup ON UPDATE CASCADE,
+  PRIMARY KEY(fh,dni), UNIQUE(fh,ninv));
+Error: near line 28: stepping, FOREIGN KEY constraint failed (19)
+1|100|2020-03-02 08:30-10:30
+2|200|2020-03-02 08:30-10:30
+Error: near line 34: stepping, FOREIGN KEY constraint failed (19)
+2|dp2
+5|dp2
+1|100|2020-03-02 08:30-10:30
+5|200|2020-03-02 08:30-10:30
+Error: near line 40: stepping, FOREIGN KEY constraint failed (19)
+
+sqlite> .tables
+evsup       maq         supervisio  tec 
+
+sqlite> SELECT * FROM evsup;
+2020-03-02 08:30-10:30
+sqlite> SELECT * FROM maq;
+200|SEAT
+sqlite> SELECT * FROM supervisio;
+1|100|2020-03-02 08:30-10:30
+5|200|2020-03-02 08:30-10:30
+sqlite> SELECT * FROM tec;
+ - 
+ 
+ *Exercicis 04python_sqlinjection:*
+En ubiwan!
+(en local instal·lar: pip install psycopg2-binary )
+
+Provar el script: user_sqlite_no_inj.py per veure les seves funcions
+
+Crear una taula de users: ./users_sqlite_inj.py -is
+Creating table users
+Query is: CREATE TABLE users (username text, passwd text);
+
+Crear estudiants: ./users_sqlite_inj.py -a
+Adding further users, leave empty username to finish
+username: ona
+passwd: ano
+username: era
+passwd: are
+username: anna
+passwd: anna
+username:  
+
+Mirar estudiants en llistat:  ./users_sqlite_inj.py -l
+Listing full table users:
+User: mar, passwd: ram
+User: ona, passwd: ano
+User: era, passwd: are
+User: anna, passwd: anna
+
+(executar ./users_sqlite_inj.py -ls si es vol veure els Queries fetes en la taula)
+--> ./users_sqlite_inj.py -ls
+Listing full table users:
+Query is: SELECT * FROM users;
+User: mar, passwd: ram
+User: ona, passwd: ano
+User: era, passwd: are
+User: anna, passwd: anna
+User: hola, passwd: aloh
+
+Provar errors en la amb INJECTION:
+ Crear usuari amb la contrasenya "'); drop table users;--":
+ 
+./users_sqlite_inj.py -as
+Adding further users, leave empty username to finish
+username: tauro
+passwd: '); drop table users;--
+Query is: INSERT INTO users VALUES ('tauro',''); drop table users;--');
+username: 
+
+Al fer un llistat es produirà error: 
+./users_sqlite_inj.py -ls
+Listing full table users:
+Query is: SELECT * FROM users;
+Traceback (most recent call last):
+  File "./users_sqlite_inj.py", line 69, in <module>
+    do_query(c, "SELECT * FROM %s;" % tabname)
+  File "./users_sqlite_inj.py", line 9, in do_query
+    c.execute(q)
+    
+EXPLICACIÓ: Aquí, el primer '); tanca la instrucció INSERT INTO prematurament. Després, drop table users; és una nova instrucció SQL que elimina la taula users. 
+Finalment, -- és un comentari en SQL, el que significa que tot el que segueixi serà ignorat, evitant errors de sintaxi per qualsevol cosa que pugui haver després del comentari.
+Borra la taula de users!
+
+Tornar a crear taula users i crear usuaris:
+
+./users_sqlite_inj.py -as
+Adding further users, leave empty username to finish
+username: mar
+passwd: ram
+Query is: INSERT INTO users VALUES ('mar','ram');
+username: era
+passwd: are
+Query is: INSERT INTO users VALUES ('era','are');
+username: hola
+passwd: aloh
+Query is: INSERT INTO users VALUES ('hola','aloh');
+username: pep 
+passwd: pep
+Query is: INSERT INTO users VALUES ('pep','pep');
+username: 
+
+./users_sqlite_inj.py -ls
+Listing full table users:
+Query is: SELECT * FROM users;
+User: mar, passwd: ram
+User: era, passwd: are
+User: hola, passwd: aloh
+User: pep, passwd: pep
+
+Provar errors en la amb INJECTION:
+
+Crear usuari amb nom: "'OR username LIKE '%"
+
+ ./users_sqlite_inj.py -as
+Adding further users, leave empty username to finish
+username: rino
+passwd: onir
+Query is: INSERT INTO users VALUES ('rino','onir');
+username: 'OR username LIKE '%
+passwd: error
+Query is: INSERT INTO users VALUES (''OR username LIKE '%','error');
+Traceback (most recent call last):
+  File "./users_sqlite_inj.py", line 55, in <module>
+    do_script(c, q) # BUT NEVER CONSTRUCT A QUERY THAT WAY
+  File "./users_sqlite_inj.py", line 14, in do_script
+    c.executescript(q)
+sqlite3.OperationalError: no such column: username
+
+ES borra tot els usuaris de la taula!
+ ./users_sqlite_inj.py -ls
+Listing full table users:
+Query is: SELECT * FROM users;
+ 
+EXPLICACIÓ: Quan introduïm el nom d'usuari com ''OR username LIKE '%', estem intentant aprofitar-nos de la construcció dinàmica de la consulta SQL per manipular la lògica d'una operació de base de dades. 
+El nom d'usuari s'introdueix de manera que, si fos part d'una consulta SQL ben formada, podria causar que la condició sempre es complís (a causa de la clàusula LIKE '%', que coincideix amb qualsevol cadena).
+
+
+arreglar aquests problemes amb --> NO INJECTION!
+utilitzar consultes parametritzades (també anomenades declaracions preparades) en lloc de construir consultes SQL mitjançant la concatenació de cadenes. 
+Exemple en el codi:
+	Tindrà errors:
+        p = input("passwd: ")
+        q = "INSERT INTO %s VALUES ('%s','%s');" % (tabname, u, p)
+        do_script(c, q) # BUT NEVER CONSTRUCT A QUERY THAT WAY
+     
+        NO tindrà errors:
+        p = input("passwd: ")
+        q = "INSERT INTO %s VALUES (?,?);" % tabname
+        do_query(c, q, (u, p))
+        
+Mateix problema  Crear usuari amb la contrasenya "'); drop table users;--":
+./users_sqlite_no_inj.py -as
+Adding further users, leave empty username to finish
+username: tauro
+passwd: oruat
+Query is: INSERT INTO users VALUES (?,?); with values ('tauro', 'oruat')
+username: rino
+passwd: ');drop table users;--
+Query is: INSERT INTO users VALUES (?,?); with values ('rino', "');drop table users;--")
+username: 
+ 
+./users_sqlite_no_inj.py -ls
+Listing full table users:
+Query is: SELECT * FROM users; with values 
+User: tauro, passwd: oruat
+User: rino, passwd: ');drop table users;--
+
+Ja no errors de INJECCIÓ!
+
+
+*** USERS EN POSTGRE SENSE INJECCIO ***
+
+Canvis en el codi:
+importar llibreria psycopg2:
+	import psycopg2
+	from psycopg2 import sql
+	
+Configurar bases de dades amb el postgreSQL:
+
+	conn = psycopg2.connect(host="ubiwan.epsevg.upc.edu", user="est_userubi", password="dB.userubi", database="est_userubi")
+	c = conn.cursor()
+
+	tabname = "users"
+Actualitzar com es fan les QUERYS: 
+ ex: insert: do_query(c, sql.SQL("INSERT INTO {} VALUES (%s, %s);").format(sql.Identifier(tabname)), (u, p))
+ (abans:  q = "INSERT INTO %s VALUES (?,?);" % tabname
+        do_query(c, q, (u, p)))
+
+
+UBIWAN:./users_postgres.py -is
+Creating table users
+Query is: CREATE TABLE "users" (username text, passwd text); with values ()
+Table not created:  relation "users" already exists
+
+Try drop table first? [y]:y
+Query is: DROP TABLE "users"; with values ()
+Query is: CREATE TABLE "users" (username text, passwd text); with values ()
+
+POSTGRE:=> \d
+                 List of relations
+ Schema |        Name        | Type  |    Owner     
+--------+--------------------+-------+--------------
+ public | accounts           | table | 
+ public | adreces            | table | 
+ public | comptes            | table | 
+ public | contractes         | table | 
+ public | movies             | table | 
+ public | pets               | table | 
+ public | titulars           | table | 
+ public | users              | table | 
+ public | view_average_score | view  | 
+ public | view_average_year  | view  | 
+ public | view_first_year    | view  | 
+(11 rows)
+
+
+UBIWAN:  ./users_postgres.py -as
+Adding further users, leave empty username to finish
+username: pep
+passwd: pep
+Query is: INSERT INTO "users" VALUES (%s, %s); with values ('pep', 'pep')
+username: donald
+passwd: quack
+Query is: INSERT INTO "users" VALUES (%s, %s); with values ('donald', 'quack')
+username: carlota
+passwd: reina
+Query is: INSERT INTO "users" VALUES (%s, %s); with values ('carlota', 'reina')
+username: pomma
+passwd: reina2
+Query is: INSERT INTO "users" VALUES (%s, %s); with values ('pomma', 'reina2')
+username: 
+
+POSTGRE:=> SELECT * from users;
+ username | passwd  
+----------+---------
+ mariona  | anoriam
+ rino     | onir
+ pep      | pep
+ donald   | quack
+ carlota  | reina
+ pomma    | reina2
+(6 rows)
+
+UBIWAN: ./users_postgres.py -ds
+Deleting an user
+username: donald
+Query is: DELETE FROM "users" WHERE username=%s; with values ('donald',)
+User donald deleted.
+
+POSTGRE:=> SELECT * from users;
+ username | passwd  
+----------+---------
+ mariona  | anoriam
+ rino     | onir
+ pep      | pep
+ carlota  | reina
+ pomma    | reina2
+(5 rows)
+
+UBIWAN: ./users_postgres.py -s
+Checking some user
+username:pep
+passwd:pep
+Query is: SELECT * FROM "users" WHERE username = %s AND passwd = %s; with values ('pep', 'pep')
+Access granted to user: pep via passwd: pep
+
+*** USERS EN MYSQL SENSE INJECCIO ***
+
+Des de local! (ubiwan dona errors)
+	pip install PyMySQL
+	chmod +x users_mysql.py
+	
+LOCAL:./users_mysql.py -i
+Creating table users
+
+mysql> show tables;
++------------------------+
+| Tables_in_est_userubiw |
++------------------------+
+| accounts               |
+| movies                 |
+| pets                   |
+| users                  |
+| view_average           |
+| view_gossos            |
++------------------------+
+6 rows in set (0.01 sec)
+
+
+LOCAL: ./users_mysql.py -a
+Adding further users, leave empty username to finish
+username: mariona
+passwd: anoriam
+username: pep
+passwd: pep
+username: carlota
+passwd: reina
+username: donald
+passwd: quack
+username:
+
+mysql> SELECT * FROM users;
++----------+---------+
+| username | passwd  |
++----------+---------+
+| mariona  | anoriam |
+| pep      | pep     |
+| carlota  | reina   |
+| donald   | quack   |
++----------+---------+
+4 rows in set (0.00 sec)
+
+
+LOCAL: ./users_mysql.py -d
+Deleting an user
+username: pep
+User potentially deleted.
+
+mysql> SELECT * FROM users;
++----------+---------+
+| username | passwd  |
++----------+---------+
+| mariona  | anoriam |
+| carlota  | reina   |
+| donald   | quack   |
++----------+---------+
+3 rows in set (0.00 sec)
+
+LOCAL: ./users_mysql.py -ls
+Listing full table users:
+Query is: SELECT * FROM users; with values None
+User: mariona, passwd: anoriam
+User: carlota, passwd: reina
+User: donald, passwd: quack
+
+LOCAL:  ./users_mysql.py -s
+Checking some user
+username:mariona
+passwd:anoriam
+Query is: SELECT * FROM users WHERE username = %s AND passwd = %s; with values ('mariona', 'anoriam')
+Access granted to user: mariona via passwd: anoriam
+
+/************************************************************/
+
