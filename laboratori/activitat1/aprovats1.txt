@@ -20,8 +20,11 @@ i les assignatures pel seu codi. La puntuació en que s'aprova una assignatura
 pot ser inferior a 5, ja que la pot aprovar compensant-la (amb una nota entre
 4 i 5).
 
-Evidentment un estudiant no pot aprovar una assignatura dues vegades.
+sqlite> .headers on
+sqlite> SELECT *FROM aprovat;
+code|name|city|district|grade|pdate|subject|semester
 
+Evidentment un estudiant no pot aprovar una assignatura dues vegades.
 
 1) Crea les queries que responguin les següents preguntes (una sola query per
 cada pregunta). Has de distingir el fet que un alumne aprova una assignatura
@@ -29,15 +32,122 @@ cada pregunta). Has de distingir el fet que un alumne aprova una assignatura
 (apareix en la relació amb una puntuació igual o major a 5).
 
 1.a) Número d'estudiants de cada comarca
+NO!! ! conta totes les vegades q surt -- estudiant pot estar varies vegades per comarca
+sqlite> SELECT city, COUNT(*) FROM aprovat GROUP BY city; 
+	city|COUNT(*)
+	Calafell|6
+	Canyelles|8
+	Cubelles|11
+	Cunit|26
+	El Vendrell|7
+	Els Monjos|10
+	La Granada|9
+	Sant Pere de Ribes|16
+	Sant Sadurní|3
+	Sitges|23
+	Vilafranca|21
+	Vilanova|10
+AIXÍ ! DISTINCT CODE -- nomes conta 1 estudiant diferent per city
+sqlite> SELECT city, COUNT(DISTINCT code) FROM aprovat GROUP BY city;
+city|COUNT(DISTINCT code)
+Calafell|2
+Canyelles|2
+Cubelles|2
+Cunit|4
+El Vendrell|1
+Els Monjos|2
+La Granada|2
+Sant Pere de Ribes|4
+Sant Sadurní|1
+Sitges|5
+Vilafranca|4
+Vilanova|1
+
+sqlite> SELECT district, COUNT(DISTINCT code) FROM aprovat GROUP BY district;
+district|COUNT(DISTINCT code)
+Alt Penedès|9
+Baix Penedès|7
+Garraf|14
+
 1.b) Els estudiants que tenen la nota més alta
+sqlite> SELECT name,grade FROM aprovat WHERE grade= (SELECT MAX(grade) FROM aprovat);
+name|grade
+Joan Cuenca Cánovas|10
+Lucía Villa Coello|10
+
 1.c) Quants estudiants no tenen cap assignatura suspesa (nota inferior a 5)
+NO!  Nomes mira en el total de notes, no per cada estudiant- esta en varies assignatures
+sqlite> SELECT COUNT(*) FROM aprovat WHERE grade<5;
+COUNT(*)
+26
+sqlite> SELECT COUNT(*) AS TotalEstudiantsSenseSuspensos
+FROM (
+    SELECT code
+    FROM aprovat
+    GROUP BY code
+    HAVING MIN(grade) >= 5
+) AS EstudiantsSenseSuspensos;
+TotalEstudiantsSenseSuspensos
+10
+
 1.d) Any en que hi ha més compensables (nota igual o superior a 4 i inferior a 5)
+sqlite> SELECT strftime('%Y', pdate) AS Any, COUNT(*) AS Compensables
+FROM aprovat
+WHERE grade >= 4 AND grade < 5
+GROUP BY strftime('%Y', pdate)
+ORDER BY Compensables DESC
+LIMIT 1;
+Any|Compensables
+2017|9
+
 1.e) L'estudiant amb més nota de cada assignatura ordenades per quadrimestre i assignatura
+sqlite> SELECT a.name, a.subject, a.semester, a.grade AS max_nota
+FROM aprovat a
+INNER JOIN (
+    SELECT subject, semester, MAX(grade) AS max_grade
+    FROM aprovat
+    GROUP BY subject, semester
+) AS max_grades ON a.subject = max_grades.subject AND a.semester = max_grades.semester AND a.grade = max_grades.max_grade
+ORDER BY a.semester, a.subject;
+name|subject|semester|max_nota
+Montserrat Galan Olmedo|FISI|Q1|8.5
+Lucía Villa Coello|FOMA|Q1|9.8
+Montserrat Galan Olmedo|FOPR|Q1|8.9
+...
+
+
 1.f) Parelles d'estudiants diferents que tenen la mateixa nota en la mateixa assignatura
+sqlite> SELECT 
+    a1.name AS Estudiant1, 
+    a2.name AS Estudiant2, 
+    a1.subject AS Assignatura, 
+    a1.grade AS Nota
+FROM 
+    aprovat a1
+JOIN 
+    aprovat a2 
+ON 
+    a1.subject = a2.subject 
+    AND a1.grade = a2.grade 
+    AND a1.name < a2.name;
+Estudiant1|Estudiant2|Assignatura|Nota
+Carla Real-Rivera|Montserrat Galan Olmedo|ARCO|6.7
+Eugenia del Gil|Nicolás Viñas Armas|SODX|7.8
+Esperanza Valentín|Soledad Gil Tello|XACO|4.1
+Joan Cuenca Cánovas|Martin Casanova-Palomares|SODX|9.8
+Martin Casanova-Palomares|Silvia Lourdes Llorens Rozas|PRO1|7.3
 
 
 2) Quines dependències funcionals (D.F.) té el problema? Usa els mateixos noms
 d'atributs que els que apareixen a la taula.
+
+code|name|city|district|grade|pdate|subject|semester
+
+R(code,name,city,discrict,grade,pdate,subject,semester)
+code-> name,city,discrict -- info del estudiant
+discrict-> city -- destricte determina ciutat (tots diferents)
+code,subject,semster->grade,pdate -- info del curs -info del resultat del curs
+semester->subject -- depen del semestre hi ha diferents assignatures
 
 
 3) A partir de les D.F. anteriors, crea les taules adequades per tal que
@@ -45,22 +155,166 @@ estiguin normalitzades en 3FN. Recorda de definir les claus primàries,
 alternatives i foranes, les polítiques ON DELETE i ON UPDATE de les claus
 foranes i si els atributs són NOT NULL.
 
+R(code,name,city,discrict,grade,pdate,subject,semester)
+code-> name,city,discrict 
+discrict-> city  (repeteix info de la primera relacio)
+semester->subject  
+code,subject->grade,pdate (no cal posar semestre- un subject en un semestre)
+
+ESTUDIANTS(code NOT NULL,name NOT NULL, city,district) PK: code
+ASSIGNATURA(subject NOT NULL, semester NOT NULL ) PK:subject
+QUALIFICACIONS(code NOT NULL,subject NOT NULL, grade NOT NULL, pdate NOT NULL) PK:code,subject
+	 FK code.ESTUDIANTS(code),subject.ASSIGNATURA(subject)
+
+NOMES POSAR LES POLÍTIQUES DE ON DELATE I UPDATE EN CLAUS FORANES!
+CREATE TABLE IF NOT EXISTS ESTUDIANTS (
+    code TEXT NOT NULL,
+    name TEXT NOT NULL,
+    city TEXT,
+    district TEXT,
+    PRIMARY KEY (code)
+);
+
+CREATE TABLE IF NOT EXISTS ASSIGNATURA (
+    subject TEXT NOT NULL,
+    semester TEXT NOT NULL,
+    PRIMARY KEY (subject)
+);
+
+CREATE TABLE IF NOT EXISTS QUALIFICACIONS (
+    code TEXT NOT NULL,
+    subject TEXT NOT NULL,
+    grade REAL NOT NULL,
+    pdate DATE NOT NULL,
+    PRIMARY KEY (code, subject),
+    FOREIGN KEY (code) REFERENCES ESTUDIANTS(code) ON DELETE RESTRICT ON UPDATE CASCADE,
+    FOREIGN KEY (subject) REFERENCES ASSIGNATURA(subject) ON DELETE RESTRICT ON UPDATE CASCADE
+);
+(On delete restrict- no elimina les entrades de estudiants-code- i assignatures-subject- )
+(On update cascade - canviar els valors si els valors de code i subject canvien- canviar a totes les taules)
 
 4) Trasllada les dades de la taula original a les taules normalitzades.
+sqlite> .tables
+ASSIGNATURA     ESTUDIANTS      QUALIFICACIONS  aprovat 
+sqlite> INSERT INTO ASSIGNATURA (subject,semester) SELECT DISTINCT subject,semester FROM aprovat;
+sqlite> SELECT * FROM ASSIGNATURA;
+subject|semester
+ARCO|Q4
+PRO1|Q2
+INTE|Q5
+ESIN|Q3
+XACO|Q4
+...
+sqlite> INSERT INTO ESTUDIANTS (code,name,city,district) SELECT DISTINCT code,name,city,district FROM aprovat;
+sqlite> SELECT *FROM ESTUDIANTS;
+code|name|city|district
+C1813|Gabriel Pla Madrigal|Sant Pere de Ribes|Garraf
+....
+SENSE POSAR DISTINCT! guardar tots els diferents codis dels estudiants
+sqlite> INSERT INTO QUALIFICACIONS (code,subject,grade,pdate) SELECT code,subject,grade,pdate FROM aprovat;
+sqlite> SELECT *FROM QUALIFICACIONS;
+code|subject|grade|pdate
+C1813|ARCO|4.3|2018-01-07
 
 
 5) Resol les mateixes queries de l'apartat 1) sobre les taules normalitzades.
-5.a)
-5.b)
-5.c)
-5.d)
-5.e)
-5.f)
+5.a)  Número d'estudiants de cada comarca
+sqlite> SELECT city, COUNT(*) AS num_estudiants FROM ESTUDIANTS GROUP BY city;
+city|num_estudiants
+Calafell|2
+Canyelles|2
+Cubelles|2
+Cunit|4
+El Vendrell|1
+Els Monjos|2
+La Granada|2
+Sant Pere de Ribes|4
+Sant Sadurní|1
+Sitges|5
+Vilafranca|4
+Vilanova|1
+
+5.b) Els estudiants que tenen la nota més alta 
+sqlite> SELECT E.name,Q.grade 
+	FROM ESTUDIANTS E 
+	JOIN QUALIFICACIONS Q ON E.code=Q.code 
+	WHERE Q.grade=(select MAX(grade) FROM QUALIFICACIONS);
+name|grade
+Joan Cuenca Cánovas|10.0
+Lucía Villa Coello|10.0
+
+5.c) Quants estudiants no tenen cap assignatura suspesa (nota inferior a 5)
+Contar per codi diferent - nomes una vegada el estudiant
+sqlite> SELECT COUNT(DISTINCT E.code)
+FROM ESTUDIANTS E
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM QUALIFICACIONS Q
+    WHERE Q.code = E.code AND Q.grade < 5
+);
+COUNT(DISTINCT E.code)
+10
+
+5.d) Any en que hi ha més compensables (nota igual o superior a 4 i inferior a 5)
+sqlite> SELECT strftime('%Y', pdate) AS Any, COUNT(*) AS Compensables
+FROM QUALIFICACIONS
+WHERE grade >= 4 AND grade < 5
+GROUP BY strftime('%Y', pdate)
+ORDER BY Compensables DESC
+LIMIT 1;
+Any|Compensables
+2017|9
+
+5.e) L'estudiant amb més nota de cada assignatura ordenades per quadrimestre i assignatura
+sqlite> SELECT E.name, A.subject,A.semester, Q.grade AS max_nota FROM ESTUDIANTS E JOIN QUALIFICACIONS Q ON E.code=Q.code JOIN ASSIGNATURA A ON A.subject=Q.subject  WHERE Q.grade=(SELECT MAX(Q2.grade) FROM QUALIFICACIONS Q2 WHERE Q2.subject=Q.subject);
+name|subject|semester|max_nota
+Carla Real-Rivera|PACO|Q5|9.3
+Vicenta Teruel Mendoza|INEP|Q3|9.5
+Esperanza Valentín|SEAX|Q6|8.9
+Esperanza Valentín|PROP|Q5|9.4
+...
+ 
+5.f) Parelles d'estudiants diferents que tenen la mateixa nota en la mateixa assignatura 
+Estudiant 1 Estudiant 2 
+Estudiant1 nota 1 == Estudiant 2 nota 2 
+Estudiant1 assig == Estudiant 2 assig 2
+
+sqlite> SELECT 
+    E1.name AS Estudiant1, 
+    E2.name AS Estudiant2, 
+    A.subject, 
+    Q1.grade
+FROM 
+    QUALIFICACIONS Q1
+INNER JOIN 
+    QUALIFICACIONS Q2 ON Q1.subject = Q2.subject AND Q1.grade = Q2.grade AND Q1.code < Q2.code
+INNER JOIN 
+    ESTUDIANTS E1 ON Q1.code = E1.code
+INNER JOIN 
+    ESTUDIANTS E2 ON Q2.code = E2.code
+INNER JOIN 
+    ASSIGNATURA A ON Q1.subject = A.subject
+ORDER BY 
+    A.subject, Q1.grade DESC;
+    
+Carla Real-Rivera|Montserrat Galan Olmedo|ARCO|6.7
+Martin Casanova-Palomares|Silvia Lourdes Llorens Rozas|PRO1|7.3
+Martin Casanova-Palomares|Joan Cuenca Cánovas|SODX|9.8
+Eugenia del Gil|Nicolás Viñas Armas|SODX|7.8
+Esperanza Valentín|Soledad Gil Tello|XACO|4.1
 
 
 6) La data en que s'han aprovat (inclou els compensables) les assignatures durant el 2019 es retarda 7 dies
 
 6.a) Quina seria la query per resoldre aquest problema sobre la taula no
 normalitzada?
+UPDATE aprovat
+SET pdate = DATE(pdate, '+7 days')
+WHERE grade >= 4
+AND strftime('%Y', pdate) = '2019';
 
 6.b) I en les taules normalitzades?
+UPDATE QUALIFICACIONS
+SET pdate = DATE(pdate, '+7 days')
+WHERE grade >= 4
+AND strftime('%Y', pdate) = '2019';
