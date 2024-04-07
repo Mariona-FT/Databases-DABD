@@ -219,20 +219,11 @@ C1813|ARCO|4.3|2018-01-07
 
 5) Resol les mateixes queries de l'apartat 1) sobre les taules normalitzades.
 5.a)  Número d'estudiants de cada comarca
-sqlite> SELECT city, COUNT(*) AS num_estudiants FROM ESTUDIANTS GROUP BY city;
-city|num_estudiants
-Calafell|2
-Canyelles|2
-Cubelles|2
-Cunit|4
-El Vendrell|1
-Els Monjos|2
-La Granada|2
-Sant Pere de Ribes|4
-Sant Sadurní|1
-Sitges|5
-Vilafranca|4
-Vilanova|1
+SELECT district,COUNT(DISTINCT code) FROM ESTUDIANTS GROUP BY district;
+district|COUNT(DISTINCT code)
+Alt Penedès|9
+Baix Penedès|7
+Garraf|14
 
 5.b) Els estudiants que tenen la nota més alta 
 sqlite> SELECT E.name,Q.grade 
