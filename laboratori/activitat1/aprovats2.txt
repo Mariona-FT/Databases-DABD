@@ -29,38 +29,210 @@ cada pregunta). Has de distingir el fet que un alumne aprova una assignatura
 (apareix en la relació amb una puntuació igual o major a 5).
 
 1.a) Número d'estudiants de cada ciutat
+sqlite> SELECT city ,COUNT(DISTINCT code) FROM aprovat GROUP BY city; 
+city|COUNT(DISTINCT code)
+Calafell|2
+Canyelles|2
+Cubelles|2
+Cunit|4
+El Vendrell|1
+Els Monjos|2
+La Granada|2
+Sant Pere de Ribes|4
+Sant Sadurní|1
+Sitges|5
+Vilafranca|4
+Vilanova|1
+
 1.b) L'estudiant amb nota mitja més alta
+mitjana - AVG group by el nom del estudiant i el seu codi -- ordenar despres per la mitjana calculada -- agafar el mes alt
+sqlite> SELECT name,code, AVG(grade) AS mitjana FROM aprovat GROUP BY code,name ORDER BY mitjana DESC LIMIT 1;
+name|code|mitjana
+Pilar Bustamante Criado|C1503|8.5
+
 1.c) Nombre d'aprovats (inclou els compensables) per cada any
+sqlite> SELECT STRFTIME('%Y',pdate) AS Any, COUNT(*) AS num_apr FROM aprovat WHERE grade>= 4 GROUP BY strftime('%Y',pdate);
+Any|num_apr
+2016|27
+2017|32
+2018|35
+2019|48
+2020|8
+
+
 1.d) L'assignatura amb més aprovats (inclous els compensables)
+Per diferents estudiants: 
+sqlite> SELECT subject,COUNT(DISTINCT code) FROM aprovat WHERE grade>=4;
+subject|COUNT(DISTINCT code)
+ARCO|30
+Per tots els estudiants que lhan fet:
+sqlite> SELECT subject,COUNT(*) FROM aprovat WHERE grade>=4;
+subject|COUNT(*)
+ARCO|150
+
 1.e) Quins estudiants tenen dos o més compensables (nota igual o superior a 4 i inferior a 5) en la fase final (de Q3 a Q6)
+
+sqlite> SELECT a.code, a.name
+FROM (
+    SELECT code, name, COUNT(*) AS num_compensables
+    FROM aprovat
+    WHERE grade >= 4 AND grade < 5 AND semester BETWEEN 'Q3' AND 'Q6'
+    GROUP BY code, name  
+    HAVING COUNT(*) >= 2
+) AS a;
+code|name
+C1813|Gabriel Pla Madrigal
+C2413|Juana del Álvaro
+
+
 1.f) Parelles d'estudiants diferents que viuen a la mateixa ciutat
+sqlite> SELECT DISTINCT
+    a1.name AS Estudiant1, 
+    a2.name AS Estudiant2,a1.city AS ciutat
+FROM 
+    aprovat a1
+JOIN 
+    aprovat a2 
+ON 
+    a1.city = a2.city 
+    AND a1.code < a2.code;
+Estudiant1|Estudiant2|ciutat
+Gabriel Pla Madrigal|Sergio del Zamorano|Sant Pere de Ribes
+Gabriel Pla Madrigal|Catalina Casas Jerez|Sant Pere de Ribes
+Alicia Losada Sánchez|Catalina Casas Jerez|Sant Pere de Ribes
+..
 
-
-2) Quines dependències funcionals (D.F.) té el problema? Usa els mateixos noms
-d'atributs que els que apareixen a la taula.
-
-
-3) A partir de les D.F. anteriors, crea les taules adequades per tal que
-estiguin normalitzades en 3FN. Recorda de definir les claus primàries,
-alternatives i foranes, les polítiques ON DELETE i ON UPDATE de les claus
-foranes i si els atributs són NOT NULL.
-
-
-4) Trasllada les dades de la taula original a les taules normalitzades.
+EN aprovats1.txt !
+	2) Quines dependències funcionals (D.F.) té el problema? Usa els mateixos noms
+	d'atributs que els que apareixen a la taula.
+	3) A partir de les D.F. anteriors, crea les taules adequades per tal que
+	estiguin normalitzades en 3FN. Recorda de definir les claus primàries,
+	alternatives i foranes, les polítiques ON DELETE i ON UPDATE de les claus
+	foranes i si els atributs són NOT NULL.
+	4) Trasllada les dades de la taula original a les taules normalitzades.
 
 
 5) Resol les mateixes queries de l'apartat 1) sobre les taules normalitzades.
-5.a)
-5.b)
-5.c)
-5.d)
-5.e)
-5.f)
 
+ESTUDIANTS(code NOT NULL,name NOT NULL, city,district) PK: code
+ASSIGNATURA(subject NOT NULL, semester NOT NULL ) PK:subject
+QUALIFICACIONS(code NOT NULL,subject NOT NULL, grade NOT NULL, pdate NOT NULL) PK:code,subject
+	 FK code.ESTUDIANTS(code),subject.ASSIGNATURA(subject)
+
+5.a) Número d'estudiants de cada ciutat
+sqlite> SELECT city, COUNT(*) AS num_estudiants FROM ESTUDIANTS GROUP BY city;
+city|num_estudiants
+Calafell|2
+Canyelles|2
+Cubelles|2
+Cunit|4
+El Vendrell|1
+Els Monjos|2
+La Granada|2
+Sant Pere de Ribes|4
+Sant Sadurní|1
+Sitges|5
+Vilafranca|4
+Vilanova|1
+
+5.b) L'estudiant amb nota mitja més alta
+sqlite> SELECT E.name, AVG(Q.grade) AS nota_mitjana FROM ESTUDIANTS E JOIN QUALIFICACIONS Q ON E.code=Q.code GROUP BY e.code ORDER BY nota_mitjana DESC;
+name|nota_mitjana
+Pilar Bustamante Criado|8.5
+Lorena Barba Casado|8.3
+Vicenta Teruel Mendoza|8.1
+...
+
+aconseguir el mes alt: 
+sqlite> SELECT E.name, AVG(Q.grade) AS nota_mitjana FROM ESTUDIANTS E JOIN QUALIFICACIONS Q ON E.code=Q.code GROUP BY e.code ORDER BY nota_mitjana DESC LIMIT 1;
+name|nota_mitjana
+Pilar Bustamante Criado|8.5
+
+5.c) Nombre d'aprovats (inclou els compensables) per cada any
+sqlite> SELECT STRFTIME('%Y', pdate) AS Any, COUNT(*) AS num_aprovats
+FROM QUALIFICACIONS
+WHERE grade >= 4
+GROUP BY STRFTIME('%Y', pdate);
+Any|num_aprovats
+2016|27
+2017|32
+2018|35
+2019|48
+2020|8
+
+5.d) L'assignatura amb més aprovats (inclous els compensables)
+sqlite> SELECT q.subject, COUNT(distinct code) AS num_aprovats
+FROM QUALIFICACIONS q
+WHERE q.grade >= 4
+GROUP BY q.subject
+ORDER BY num_aprovats DESC
+LIMIT 1;
+subject|num_aprovats
+SODX|10
+
+
+5.e)  Quins estudiants tenen dos o més compensables (nota igual o superior a 4 i inferior a 5) en la fase final (de Q3 a Q6)
+Agafar el codi de qualificacions, nom estudiants, nota qualificacions, semestre assignatura 
+	enllaçar per codi : qualificacions i estudiants
+	enllaçar per subject: assignatura i qualificacions 
+
+sqlite> SELECT q.code, e.name
+FROM QUALIFICACIONS q
+JOIN ESTUDIANTS e ON q.code = e.code
+JOIN ASSIGNATURA a ON q.subject = a.subject
+WHERE q.grade >= 4 AND q.grade < 5
+  AND a.semester IN ('Q3', 'Q4', 'Q5', 'Q6')
+GROUP BY q.code
+HAVING COUNT(*) >= 2;
+code|name
+C1813|Gabriel Pla Madrigal
+C2413|Juana del Álvaro
+
+5.f) Parelles d'estudiants diferents que viuen a la mateixa ciutat
+sqlite> SELECT 
+    E1.name AS Estudiant1, 
+    E2.name AS Estudiant2, 
+    E1.city AS ciutat
+FROM 
+    ESTUDIANTS E1 INNER JOIN ESTUDIANTS E2 ON E1.city=E2.city AND E1.code<E2.code;
+Error: in prepare, near "Estudiant": syntax error (1)
+sqlite> SELECT 
+    E1.name AS Estudiant1, 
+    E2.name AS Estudiant2, 
+    E1.city AS ciutat
+FROM 
+    ESTUDIANTS E1 
+INNER JOIN 
+    ESTUDIANTS E2 ON E1.city = E2.city AND E1.code < E2.code;
+Estudiant1|Estudiant2|ciutat
+Gabriel Pla Madrigal|Sergio del Zamorano|Sant Pere de Ribes
+Gabriel Pla Madrigal|Alicia Losada Sánchez|Sant Pere de Ribes
+Gabriel Pla Madrigal|Catalina Casas Jerez|Sant Pere de Ribes
+Alicia Losada Sánchez|Catalina Casas Jerez|Sant Pere de Ribes
+Esperanza Valentín|Mario Alemán Tomé|Cunit
+...
 
 6) Pel coronavirus els estudiants que tenen una nota mitja >=6.5 de totes les assignatures aproven DABD amb un 5 amb data 01-04-2020
 
 6.a) Quina seria la query per resoldre aquest problema sobre la taula no
 normalitzada?
 
+UPDATE aprovat
+SET grade = 5, pdate = '2020-04-01'
+WHERE code IN (
+    SELECT code
+    FROM aprovat
+    GROUP BY code
+    HAVING AVG(grade) >= 6.5
+) AND subject = 'DABD';
+
 6.b) I en les taules normalitzades?
+UPDATE QUALIFICACIONS
+SET grade = 5, pdate = '2020-04-01'
+WHERE code IN (
+    SELECT code
+    FROM QUALIFICACIONS
+    JOIN ASSIGNATURA ON QUALIFICACIONS.subject = ASSIGNATURA.subject
+    GROUP BY code
+    HAVING AVG(grade) >= 6.5
+) AND subject = 'DABD';
