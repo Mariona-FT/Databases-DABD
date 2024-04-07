@@ -226,6 +226,23 @@ WHERE code IN (
     HAVING AVG(grade) >= 6.5
 ) AND subject = 'DABD';
 
+
+sqlite> SELECT * FROM aprovat WHERE subject='DABD';
+C2147|Lucía Villa Coello|Cunit|Baix Penedès|8|2017-03-25|DABD|Q6
+C3066|Sergio del Zamorano|Sant Pere de Ribes|Garraf|6|2016-06-13|DABD|Q6
+C3556|Guillermo Tomé Escudero|La Granada|Alt Penedès|5.8|2018-06-07|DABD|Q6
+C8990|Vicenta Teruel Mendoza|Els Monjos|Alt Penedès|6.6|2020-03-01|DABD|Q6
+C0643|Martin Casanova-Palomares|Cunit|Baix Penedès|7.6|2019-08-04|DABD|Q6
+C7017|Eugenia del Gil|Canyelles|Garraf|4.9|2016-03-20|DABD|Q6
+...
+sqlite> SELECT * FROM aprovat WHERE subject='DABD';
+C2147|Lucía Villa Coello|Cunit|Baix Penedès|5|2020-04-01|DABD|Q6
+C3066|Sergio del Zamorano|Sant Pere de Ribes|Garraf|5|2020-04-01|DABD|Q6
+C3556|Guillermo Tomé Escudero|La Granada|Alt Penedès|5|2020-04-01|DABD|Q6
+C8990|Vicenta Teruel Mendoza|Els Monjos|Alt Penedès|5|2020-04-01|DABD|Q6
+C0643|Martin Casanova-Palomares|Cunit|Baix Penedès|5|2020-04-01|DABD|Q6
+C7017|Eugenia del Gil|Canyelles|Garraf|5|2020-04-01|DABD|Q6
+
 6.b) I en les taules normalitzades?
 UPDATE QUALIFICACIONS
 SET grade = 5, pdate = '2020-04-01'
