@@ -94,32 +94,108 @@ C8990|INEP|ESIN
 C3904|INTE|PACO
 ...
 
-2) Quines dependències funcionals (D.F.) té el problema? Usa els mateixos noms
-d'atributs que els que apareixen a la taula.
 
+/** EN FITXER APROVATS1.txt **/	
+	
+	2) Quines dependències funcionals (D.F.) té el problema? Usa els mateixos noms
+	d'atributs que els que apareixen a la taula.
+	code|name|city|district|grade|pdate|subject|semester
+	code-> name, city, district
+	city-> district (cada disctrict sera unic per aquella ciutat)
+	name -/-> code
+	name-/->grade
+	pdate,subject->grade,semester
+	code, subject, pdate -> grade, semester, name, city, district 
+	Això assumeix que un estudiant no pot aprovar la mateixa assignatura més d'una vegada en el mateix dia, la qual cosa és raonable segons la descripció.
+	code-> name, city, district
+	Això assumiria que un estudiant sempre viu a la mateixa ciutat i districte, i que el seu nom no canvia.
 
+	3) A partir de les D.F. anteriors, crea les taules adequades per tal que
+	estiguin normalitzades en 3FN. Recorda de definir les claus primàries,
+	alternatives i foranes, les polítiques ON DELETE i ON UPDATE de les claus
+	foranes i si els atributs són NOT NULL.
 
-3) A partir de les D.F. anteriors, crea les taules adequades per tal que
-estiguin normalitzades en 3FN. Recorda de definir les claus primàries,
-alternatives i foranes, les polítiques ON DELETE i ON UPDATE de les claus
-foranes i si els atributs són NOT NULL.
-
-
-4) Trasllada les dades de la taula original a les taules normalitzades.
-
+	4) Trasllada les dades de la taula original a les taules normalitzades.
 
 5) Resol les mateixes queries de l'apartat 1) sobre les taules normalitzades.
-5.a) La comarca amb més número d'estudiants
-5.b) Els dos estudiants amb nota mitja més alta
-5.c) Any en que hi han més aprovats (inclou els compensables)
-5.d) Les dues assignatures amb més aprovats (inclou els compensables)
-5.e) Quins estudiants tenen almenys 3 assignatures aprovades en un mateix quadrimestre
-5.f) Parelles d'assignatures diferents del quadrimestre Q4 aprovades pel mateix estudiant
 
+5.a) La comarca amb més número d'estudiants
+sqlite> SELECT district, COUNT(*) AS num_estudiants
+FROM ESTUDIANTS
+GROUP BY district
+ORDER BY num_estudiants DESC
+LIMIT 1;
+district|num_estudiants
+Garraf|14
+
+5.b) Els dos estudiants amb nota mitja més alta
+sqlite> SELECT code, AVG(grade) AS avg_grade
+FROM QUALIFICACIONS
+WHERE grade >= 5
+GROUP BY code
+ORDER BY avg_grade DESC
+LIMIT 2;
+code|avg_grade
+C2413|9.1
+C1503|8.5
+
+5.c) Any en que hi han més aprovats (inclou els compensables)
+sqlite> SELECT strftime('%Y', pdate) AS year, COUNT(*) AS num_approved
+FROM QUALIFICACIONS
+GROUP BY year
+ORDER BY num_approved DESC
+LIMIT 1;
+year|num_approved
+2019|48
+
+5.d) Les dues assignatures amb més aprovats (inclou els compensables)
+sqlite> SELECT subject, COUNT(*) AS num_approved
+FROM QUALIFICACIONS
+GROUP BY subject
+ORDER BY num_approved DESC
+LIMIT 2;
+subject|num_approved
+SODX|10
+PRO1|9
+
+5.e) Quins estudiants tenen almenys 3 assignatures aprovades en un mateix quadrimestre
+sqlite> SELECT code, semester, COUNT(*) AS num_subjects
+FROM QUALIFICACIONS
+JOIN ASSIGNATURA ON QUALIFICACIONS.subject = ASSIGNATURA.subject
+WHERE grade >= 5
+GROUP BY code, semester
+HAVING num_subjects >= 3;
+code|semester|num_subjects
+C3904|Q3|3
+C4221|Q6|3
+C5069|Q1|3
+C9872|Q2|3
+
+5.f) Parelles d'assignatures diferents del quadrimestre Q4 aprovades pel mateix estudiant
+sqlite> SELECT a.code, a.subject AS subject1, b.subject AS subject2
+FROM QUALIFICACIONS a
+JOIN QUALIFICACIONS b ON a.code = b.code AND a.subject <> b.subject
+JOIN ASSIGNATURA aa ON a.subject = aa.subject
+JOIN ASSIGNATURA ab ON b.subject = ab.subject
+WHERE aa.semester <> 'Q4' AND ab.semester <> 'Q4' AND a.grade >= 5 AND b.grade >= 5
+GROUP BY a.code, a.subject, b.subject;
+code|subject1|subject2
+C0602|FISI|LOAL
+C0602|FISI|SIOP
+C0602|LOAL|FISI
+...
 
 6) La data en que s'han aprovat (inclou els compensables) les assignatures durant el 2018 es retarda un mes
 
 6.a) Quina seria la query per resoldre aquest problema sobre la taula no
 normalitzada?
+UPDATE aprovat
+SET pdate = date(pdate, '+1 month')
+WHERE strftime('%Y', pdate) = '2018';
 
 6.b) I en les taules normalitzades?
+UPDATE QUALIFICACIONS
+SET pdate = date(pdate, '+1 month')
+WHERE strftime('%Y', pdate) = '2018';
+
+
