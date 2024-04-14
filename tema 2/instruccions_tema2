@@ -166,4 +166,17 @@ cal treure la clau alternativa UNIQUE(fh,ninv), també està en BCNF i, per tant
 - N.Inv.→ DNI (no cal saber la franja horària pq sempre sera el mateix fa tecninc que estarà associat en una màquina )
 - N.Inv → FH  (per aixi tenir la franja horària que es supervisa la màquina)
 
+Polítiques CLAUS FORANES: 
+	ON DELETE
+- CASCADE: Utilitza aquesta opció si vols que l'eliminació d'una fila en la taula pare porti a l'eliminació automàtica de totes les files relacionades en la taula filla. Això és útil quan la presència de la fila filla no té sentit sense la fila pare.
 
+- SET NULL: Escolleix aquesta opció si les files filles poden romandre sense una relació amb la fila pare. Això pot deixar la fila filla en un estat 'òrfena', el que pot ser adequat en alguns casos, com per exemple, quan una relació no és estricte.
+
+- RESTRICT / NO ACTION: Utilitza aquestes opcions si no vols que la fila pare sigui eliminada quan hi ha files filles relacionades. Aquesta és la opció més segura per prevenir la pèrdua accidental de dades.
+
+- SET DEFAULT: Utilitza aquesta opció per establir un valor predeterminat a la clau forana en les files filles quan la fila pare és eliminada. Aquesta opció no és tan comuna i requereix que s'hagi definit un valor predeterminat.
+
+ON UPDATE
+- CASCADE: Aquesta opció és útil quan el valor de la clau forana en la fila filla ha de correspondre sempre al valor de la clau primària en la fila pare. Això és comú en identificadors que canvien rarament, com ara IDs numèrics autoincrementats.
+
+- NO ACTION: Escull aquesta opció quan els canvis en la clau primària de la taula pare no s'haurien de reflectir en la taula filla. Això és útil quan el valor de la clau forana en la fila filla no depèn directament del valor actual de la clau primària en la fila pare.
