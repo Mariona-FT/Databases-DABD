@@ -1,0 +1,241 @@
+Considerem que gestionem la facturació de productes a empreses mitjançant una
+única relació, amb els següents atributs:
+
+* NIF de l'empresa - nif
+* Nom de l'empresa - cname
+* Ciutat on està ubicada l'empresa -city
+* Codi del producte  - code
+* Nom del producte - pname
+* Preu de cost del producte - cost price
+* Número de la factura - num
+* Data de la factura - idate
+* Quantitat de producte que s'ha facturat - qty
+* Preu a que s'ha facturat l'unitat de producte - price
+
+Les empreses es distingeixen pel seu NIF, les ciutats pel seu nom, els
+productes pel seu codi i les factures pel seu número. 
+Una mateixa factura pot tenir varis productes facturats. - num (factura) -- varis entrades (diferents productes pnames..)
+Un producte no pot aparèixer a la mateixa factura dues vegades.
+
+
+1) Crea les queries que responguin les següents preguntes (una sola query per
+cada pregunta).
+
+Per import facturat s'entén el preu facturat per unitat multiplicat per la
+quantitat facturada. --> import facturat: price x qty
+
+Per benefici s'entén la diferència entre el preu facturat menys el preu de
+cost multiplicada per la quantitat facturada. benefici: ( price - cost_price ) x qty 
+
+sqlite> SELECT * FROM lin_factura ;
+nif|cname|city|code|pname|cost_price|num|idate|qty|price
+...
+
+
+1.a) Les dues empreses amb més quantitat de factures
+
+Contar les factures - no repetides ja distinct
+
+sqlite>  SELECT cname,nif, COUNT(DISTINCT num) AS q_fact FROM lin_factura GROUP BY nif ORDER BY q_fact DESC LIMIT 2;
+cname|nif|q_fact
+Ropero, Alfaro & Vilalta|D13404638|7
+Vicente-Morera|W14787701|6
+
+1.b) Empresa amb la factura amb major import total
+factura- te diverses linies de producte  SUMAR ELS VALORS DAQUESTES 
+SUM import 
+
+sqlite>  SELECT cname,num,SUM(price*qty) AS import_total FROM lin_factura GROUP BY num ORDER BY import_total DESC LIMIT 1 ;
+cname|num|import_total
+Figueras SA|19-0122|32640.72
+
+1.c) Mes amb major número de factures
+
+Agafar per mes contar les factures diferents fetes en aquest temps
+
+sqlite> SELECT strftime('%m',idate) AS mes, COUNT(DISTINCT num) AS dif_factures FROM lin_factura GROUP BY strftime('%m',idate) ORDER BY dif_factures DESC LIMIT 1;
+mes|dif_factures
+03|10
+
+1.d) Benefici obtingut per cada empresa
+ benefici: ( price - cost_price ) x qty 
+SUMAR per cada benefici i agrupar per la empresa 
+
+sqlite>   SELECT cname,nif,SUM((price-cost_price)*qty) AS benefici_total FROM lin_factura GROUP BY nif ORDER BY benefici_total DESC;
+cname|nif|benefici_total
+Ropero, Alfaro & Vilalta|D13404638|33633.27
+Marcos SL|E16617660|25650.16
+Vicente-Morera|W14787701|22859.07
+Hernández & Sons|F31089103|22313.4
+Vilaplana, Poza & Ariño|Y19863150|21319.69
+Garay, Estrada & Seguí|Z57342528|17938.03
+Figueras SA|Z67966969|15264.39
+Atienza-Alberola|O02742297|15207.03
+Soler, Segarra & Valdés|W71576296|14977.13
+Roda, Cruz & Iglesias|K12087886|12392.55
+Bellido, Botella & Salom|X58378104|12205.68
+Adán, Sanmiguel & Redondo|C38505147|11824.24
+Rosa, Zurita & Rosselló|N86017838|10238.75
+Bas-Oller|D18007970|7118.58
+Pi-Peña|F46893188|6741.18
+Jove Inc|W94174332|6585.99
+Suarez-Cabo|I25061135|6129.12
+Campos, Carranza & Tena|P38208128|5511.66
+Martín & Sons|R26982705|4440.52
+Uriarte Group|Q28426013|253.92
+
+1.e) Parelles d'empreses diferents ubicades a la mateixa ciutat
+
+Fer una selecció amb distinct- sino les empreses amb mateixes ciutats es van repetint
+
+sqlite>  SELECT DISTINCT E1.cname AS Empresa1,  E2.cname AS Empresa2,  E1.city AS ciutat FROM  lin_factura E1  INNER JOIN  lin_factura E2 ON E1.city = E2.city AND E1.nif < E2.nif;
+Pi-Peña|Figueras SA|Sevilla
+Jove Inc|Bellido, Botella & Salom|Pontevedra
+
+2) Quines dependències funcionals (D.F.) té el problema? Usa els mateixos nomsd'atributs que els que apareixen a la taula.
+
+* NIF de l'empresa - nif
+* Nom de l'empresa - cname
+* Ciutat on està ubicada l'empresa -city
+
+* Codi del producte  - code
+* Nom del producte - pname
+* Preu de cost del producte - cost price
+
+* Número de la factura - num
+* Data de la factura - idate
+
+* Quantitat de producte que s'ha facturat - qty
+* Preu a que s'ha facturat l'unitat de producte - price
+
+R (nif|cname|city|code|pname|cost_price|num|idate|qty|price)
+num,code ->cost_price,idate,qty,price -- Un producte no pot aparèixer a la mateixa factura dues vegades. 
+
+EMPRESES: nif-> cname,city
+FACT_PRODUCTE: num,code->pname,cost_price,idate,qty,price
+PRODUCTES: nif->num,code
+
+Segons el nif d'una empresa pots trobar el seu nom i la ciutat on esta
+EMPRESES: nif-> cname,city PK: NIF
+
+Segons el numero de factura i el codi d'un producte pots trobar tota la informació de la factura d'aquest sol producte
+FACT_PRODUCTE: num,code->pname,cost_price,idate,qty,price PK: num,code 
+
+Segons el nif de l'empresa i el numero de factura pots trobar tots els codis dels diferents productes dins daquella sola factura 
+
+PRODUCTES: nif,num,code PK: nif,num,code FK: EMPRESES(nif), num FK: FACT_PRODUCTE(num), FK: FACT_PRODUCTE(code)
+
+3) A partir de les D.F. anteriors, crea les taules adequades per tal que
+estiguin normalitzades en 3FN. Recorda de definir les claus primàries,
+alternatives i foranes, les polítiques ON DELETE i ON UPDATE de les claus
+foranes i si els atributs són NOT NULL.
+
+Es recomanable posar en les taules normalitzades els mateixos noms d'atributs
+que els de la taula original, així et serà més fàcil transferir les dades.
+Tens llibertat per triar els noms de la taules normalitzades, però intenta que
+siguin noms adequats, que expressin el concepte que emmagatzemen.
+
+CREATE TABLE lin_factura (
+    nif   char(8),
+    cname varchar(50),
+    city  varchar(50),
+    code  char(13),
+    pname varchar(50),
+    cost_price decimal(8, 2),
+    num   char(7),
+    idate date,
+    qty   decimal(2),
+    price decimal(8, 2)
+);
+
+EMPRESES: nif-> cname,city PK: NIF
+FACT_PRODUCTE: num,code->pname,cost_price,idate,qty,price PK: num,code 
+PRODUCTES: nif,num,code PK: nif,num FK: EMPRESES(nif), num FK: FACT_PRODUCTE(num), FK: FACT_PRODUCTE(code)
+
+CREATE TABLE EMPRESES(
+    nif   char(8) NOT NULL,
+    cname varchar(50) NOT NULL,
+    city  varchar(50) NOT NULL,
+     PRIMARY KEY (nif)
+);
+
+CREATE TABLE FACT_PRODUCTE ( num   char(7) NOT NULL, code  char(13) NOT NULL, pname varchar(50) NOT NULL, cost_price decimal(8, 2) NOT NULL, idate date NOT NULL, qty   decimal(2) NOT NULL, price decimal(8, 2) NOT NULL, PRIMARY KEY (num,code) );
+
+
+CREATE TABLE PRODUCTES(
+    nif   char(8) NOT NULL,
+    num   char(7) NOT NULL, 
+    code  char(13) NOT NULL,
+    PRIMARY KEY (nif,num,code),
+    FOREIGN KEY (nif) REFERENCES EMPRESES(nif) ON DELETE RESTRICT ON UPDATE CASCADE,
+    FOREIGN KEY (num) REFERENCES FACT_PRODUCTE(num) ON DELETE RESTRICT ON UPDATE CASCADE,
+    FOREIGN KEY (code) REFERENCES FACT_PRODUCTE(numcode) ON DELETE RESTRICT ON UPDATE CASCADE
+);
+
+4) Trasllada les dades de la taula original a les taules normalitzades.
+ 
+ INSERT INTO EMPRESES (nif,cname,city) SELECT DISTINCT nif,cname,city FROM lin_factura;
+sqlite> SELECT * FROM EMPRESES ;
+W14787701|Vicente-Morera|Vizcaya
+O02742297|Atienza-Alberola|Asturias
+D18007970|Bas-Oller|Albacete
+...
+
+INSERT INTO FACT_PRODUCTE ( num,code, pname, cost_price, idate,qty, price) SELECT num,code, pname, cost_price, idate,qty, price FROM lin_factura;
+sqlite> SELECT * FROM FACT_PRODUCTE ;
+num|code|pname|cost_price|idate|qty|price
+19-3623|1756413942206|Zamcore|850.68|2017-03-01|1|1429.14
+19-9533|0295794827173|Hotlam|433.02|2018-02-05|1|480.65
+19-3107|3700456785045|Fixottech|41.22|2016-06-13|8|79.55
+...
+INSERT INTO PRODUCTES(nif,num,code) SELECT DISTINCT nif,num,code FROM lin_factura;
+sqlite> select * from PRODUCTES ;
+nif|num|code
+W14787701|19-3623|1756413942206
+W14787701|19-9533|0295794827173
+...
+
+5) Resol les mateixes queries de l'apartat 1) sobre les taules normalitzades.
+
+5.a) Les dues empreses amb més quantitat de factures
+EMPRESES - nif 
+PRODUCTES- contra per nif els diferents numeros
+
+sqlite> SELECT E.nif, COUNT (DISTINCT P.num) AS q_fact FROM EMPRESES E JOIN PRODUCTES P ON E.nif=P.nif GROUP BY E.nif ORDER BY q_fact DESC LIMIT 2;
+nif|q_fact
+D13404638|7
+W14787701|6
+ 
+5.b) Empresa amb la factura amb major import total
+EMPRESA - nif,
+Per E.nif=PRODUCTE.nif trobar P.num amb P.code
+Per P.num amb P.code sumar SUM(price*qty) AS import_total 
+
+EMPRESES: nif-> cname,city PK: NIF
+FACT_PRODUCTE: num,code->pname,cost_price,idate,qty,price PK: num,code 
+PRODUCTES: nif,num,code PK: nif,num FK: EMPRESES(nif), num FK: FACT_PRODUCTE(num), FK: FACT_PRODUCTE(code)
+
+
+sqlite>  SELECT cname,num,SUM(price*qty) AS import_total FROM lin_factura GROUP BY num ORDER BY import_total DESC LIMIT 1 ;
+cname|num|import_total
+Figueras SA|19-0122|32640.72
+
+
+5.c) Mes amb major número de factures 
+
+PRODUCTE - filtrar per mesos i contar diferents num de factures
+sqlite> SELECT strftime('%m',P.idate) AS mes, COUNT(DISTINCT P.num) AS dif_factures FROM FACT_PRODUCTE P GROUP BY strftime('%m',P.idate) ORDER BY dif_factures DESC LIMIT 1;
+mes|dif_factures
+03|10
+
+5.d) Benefici obtingut per cada empresa
+
+5.e) Parelles d'empreses diferents ubicades a la mateixa ciutat
+EMPRESES - treure dos empreses i comprar les ciutats
+
+sqlite>  SELECT DISTINCT E1.cname AS Empresa1,  E2.cname AS Empresa2,  E1.city AS ciutat FROM  EMPRESES E1  INNER JOIN  EMPRESES E2 ON E1.city = E2.city AND E1.nif < E2.nif;
+Empresa1|Empresa2|ciutat
+Pi-Peña|Figueras SA|Sevilla
+Jove Inc|Bellido, Botella & Salom|Pontevedra
+
+

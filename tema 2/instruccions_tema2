@@ -180,3 +180,7 @@ ON UPDATE
 - CASCADE: Aquesta opció és útil quan el valor de la clau forana en la fila filla ha de correspondre sempre al valor de la clau primària en la fila pare. Això és comú en identificadors que canvien rarament, com ara IDs numèrics autoincrementats.
 
 - NO ACTION: Escull aquesta opció quan els canvis en la clau primària de la taula pare no s'haurien de reflectir en la taula filla. Això és útil quan el valor de la clau forana en la fila filla no depèn directament del valor actual de la clau primària en la fila pare.
+
+Dades Històriques: Si és important mantenir un registre històric, inclús després que l'element relacionat ha estat eliminat, ON DELETE SET NULL o NO ACTION poden ser les millors opcions.
+
+Integritat de Dades: Si les dades han de romandre consistents i cada fila filla ha de tenir una fila pare corresponent vàlida en tot moment, llavors CASCADE o RESTRICT són opcions a considerar.
