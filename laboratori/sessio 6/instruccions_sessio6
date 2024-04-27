@@ -148,9 +148,9 @@ DATABASES = {
        # 'ENGINE': 'django.db.backends.sqlite3',
        # 'NAME': BASE_DIR / 'db.sqlite3',
          'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'est_userubi',  # Nom de la teva base de dades
-        'USER': 'est_userubi',          # El teu usuari de PostgreSQL
-        'PASSWORD': 'dB.userubi', # La contrasenya de PostgreSQL
+        'NAME': 'est..',  # Nom de la teva base de dades
+        'USER': 'est..',          # El teu usuari de PostgreSQL
+        'PASSWORD': 'dB...', # La contrasenya de PostgreSQL
         'HOST': 'ubiwan.epsevg.upc.edu', # Servidor de la base de dades
         'PORT': '5432',            # Port del servidor de PostgreSQL
         }
@@ -197,7 +197,7 @@ I entre les plantilles de productes i categories hi ha una relació de molts a m
 Django ja crea automàticament la taula intermèdia que implementa la relació de molts a molts). 
 Els camps categoria pare i plantilles de producte haurien de poder ser buits o nulls; mireu a la documentació de Django com podeu usar les opcions blank i null, doncs per defecte els camps no poden ser buits.
 
-
+Nova ENTITAT guardar en els models:
 mariona@mariona-laptop:~/Documentos/altres-DABD/sessio6/dabd/producte$ nano models.py 
 ...
 class ProductCategory(models.Model):
@@ -217,6 +217,7 @@ class ProductCategory(models.Model):
         return self.name
 ...
 
+Guardar els canvis:
 mariona@mariona-laptop:~/Documentos/altres-DABD/sessio6/dabd$ python3 manage.py makemigrations
 Migrations for 'producte':
   producte/migrations/0002_productcategory.py
@@ -238,8 +239,7 @@ admin.site.register(ProductTemplate)
 admin.site.register(ProductVariant)
 admin.site.register(ProductCategory)
 
-
-
+	** PART 3 **
 
 
 
