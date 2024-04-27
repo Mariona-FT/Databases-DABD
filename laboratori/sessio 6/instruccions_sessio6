@@ -1,0 +1,256 @@
+Instruccions utilitzades en la sessió 4:
+
+
+	** PART 1: **
+instal·lar django al sistema: 
+mariona@mariona-laptop:~$ python3 -m pip install Django
+
+Assegurar que s'ha instalat amb la comanda: 
+mariona@mariona-laptop:~$ python3 -m django --version
+5.0.4
+
+Crear una carpeta per aquesta sessió, i a dins d'aquesa crear el projecte de dabd:
+mariona@mariona-laptop:~/Documentos/altres-DABD/sessio6$ django-admin startproject dabd
+
+Dins d'aquesta ARRENCAR EL SERVIDOR: 
+mariona@mariona-laptop:~/Documentos/altres-DABD/sessio6/dabd$ python3 manage.py runserver 8080
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+
+You have 18 unapplied migration(s). Your project may not work properly until you apply the migrations for app(s): admin, auth, contenttypes, sessions.
+Run 'python manage.py migrate' to apply them.
+April 27, 2024 - 10:41:01
+Django version 5.0.4, using settings 'dabd.settings'
+Starting development server at http://127.0.0.1:8080/
+Quit the server with CONTROL-C.
+
+Ara podrem entrar al server amb aquesta adreça: http://127.0.0.1:8080/
+
+Crear una APLICACIÓ dins del projecte per gestionar productes anomenada: producte
+
+mariona@mariona-laptop:~/Documentos/altres-DABD/sessio6/dabd$ python3 manage.py startapp producte
+mariona@mariona-laptop:~/Documentos/altres-DABD/sessio6/dabd$ ls
+dabd  db.sqlite3  manage.py  producte
+
+Crear una BASE DE DADES: 
+mariona@mariona-laptop:~/Documentos/altres-DABD/sessio6/dabd$ python3 manage.py migrate
+mariona@mariona-laptop:~/Documentos/altres-DABD/sessio6/dabd$ python3 manage.py createsuperuser
+Username (leave blank to use 'mariona'): 
+Email address: mariona@gmail.com
+Password: **** 
+Password (again): ****
+This password is too short. It must contain at least 8 characters.
+This password is too common.
+This password is entirely numeric.
+Bypass password validation and create user anyway? [y/N]: y
+Superuser created successfully.
+
+Ara es pot anar a: http://127.0.0.1:8080/admin
+On hi haurà un login del superuser: user:mariona contra:****
+ENG
+mariona@mariona-laptop:~/Documentos/altres-DABD/sessio6/dabd$ python3 manage.py runserver 8080
+
+
+	** PART 2: **
+Crear els models: en el fitxer /dabd/producte/models.py
+Copiar l'esquema basic dels models:
+
+from django.db import models
+
+
+class ProductTemplate(models.Model):
+    name = models.CharField(max_length=200)
+    list_price = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    cost_price = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    salable = models.BooleanField()
+    ...
+
+    def __str__(self):
+        return self.name
+
+
+class ProductVariant(models.Model):
+    template = models.ForeignKey(ProductTemplate, on_delete=models.CASCADE)
+    code = models.CharField(max_length=200)
+    ...
+
+    def __str__(self):
+        return '[' + self.code + '] ' + self.template.name
+       
+incloure l'aplicació producte dins del projecte de dabd, aixi que posar en els /dabd/dabd/setting.py
+la línia: 
+INSTALLED_APPS = [
+    'producte.apps.ProducteConfig',
+    ...
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+]
+
+Guardar els canvis en el nostre model fent una migració:
+mariona@mariona-laptop:~/Documentos/altres-DABD/sessio6/dabd$ python3 manage.py makemigrations producte
+Migrations for 'producte':
+  producte/migrations/0001_initial.py
+    - Create model ProductTemplate
+    - Create model ProductVariant
+
+mariona@mariona-laptop:~/Documentos/altres-DABD/sessio6/dabd$ python3 manage.py sqlmigrate producte 0001
+BEGIN;
+--
+-- Create model ProductTemplate
+--
+CREATE TABLE "producte_producttemplate" ("id" integer NOT NULL PRIMARY KEY AUTOINCREMENT, "name" varchar(200) NOT NULL, "list_price" decimal NOT NULL, "cost_price" decimal NOT NULL, "salable" bool NOT NULL);
+--
+-- Create model ProductVariant
+--
+CREATE TABLE "producte_productvariant" ("id" integer NOT NULL PRIMARY KEY AUTOINCREMENT, "code" varchar(200) NOT NULL, "template_id" bigint NOT NULL REFERENCES "producte_producttemplate" ("id") DEFERRABLE INITIALLY DEFERRED);
+CREATE INDEX "producte_productvariant_template_id_98e2e5bf" ON "producte_productvariant" ("template_id");
+COMMIT;
+
+
+mariona@mariona-laptop:~/Documentos/altres-DABD/sessio6/dabd$ python3 manage.py migrate
+Operations to perform:
+  Apply all migrations: admin, auth, contenttypes, producte, sessions
+Running migrations:
+  Applying producte.0001_initial... OK
+
+Indicar els models creats també son gestionables per la part administrativa del projecte:
+mariona@mariona-laptop:~/Documentos/altres-DABD/sessio6/dabd/producte$ nano admin.py 
+from django.contrib import admin
+
+from .models import ProductTemplate, ProductVariant
+
+admin.site.register(ProductTemplate)
+admin.site.register(ProductVariant)
+
+Ara si s'entra en servidor /admin, es pot veure que es pot administrar les plantilles del producte: Product template 
+i les variants del producte: Produtc Variant
+(També ha de sortir : Groups i Users)
+
+
+** EXERCICIS: **
+1. Canvia la configuració del fitxer dabd/settings.py per usar un altre SGBD com per exemple el PostgreSQL del servidor ubiwan.epsevg.upc.edu que escolta pel port 5432 (https://docs.djangoproject.com/en/3.1/ref/settings/#databases), 
+Genera les taules a la nova base de dades (python manage.py migrate) i torna a crear un usuari administrador (python manage.py createsuperuser). 
+Per exemple, per PostgreSQL et caldrà instal·lar prèviament la llibreria de Python que permet connectar-se a una base de dades PostgreSQL (pip install psycopg2 o pip install psycopg2-binary).
+
+Verificar que hi ha instalat postgres:
+mariona@mariona-laptop:~/Documentos/altres-DABD/sessio6/dabd$ pip install psycopg2-binary
+mariona@mariona-laptop:~/Documentos/altres-DABD/sessio6/dabd/dabd$ pip install mysql-connector-python
+
+Canviar els settings del projecte: dabd/dabd/settings.py
+DATABASES = {
+    'default': {
+       # 'ENGINE': 'django.db.backends.sqlite3',
+       # 'NAME': BASE_DIR / 'db.sqlite3',
+         'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'est_userubi',  # Nom de la teva base de dades
+        'USER': 'est_userubi',          # El teu usuari de PostgreSQL
+        'PASSWORD': 'dB.userubi', # La contrasenya de PostgreSQL
+        'HOST': 'ubiwan.epsevg.upc.edu', # Servidor de la base de dades
+        'PORT': '5432',            # Port del servidor de PostgreSQL
+        }
+}
+
+mariona@mariona-laptop:~/Documentos/altres-DABD/sessio6/dabd$ python3 manage.py migrate
+Operations to perform:
+  Apply all migrations: admin, auth, contenttypes, producte, sessions
+Running migrations:
+  Applying contenttypes.0001_initial... OK
+  Applying auth.0001_initial... OK
+  Applying admin.0001_initial... OK
+  Applying admin.0002_logentry_remove_auto_add... OK
+  Applying admin.0003_logentry_add_action_flag_choices... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying auth.0008_alter_user_username_max_length... OK
+  Applying auth.0009_alter_user_last_name_max_length... OK
+  Applying auth.0010_alter_group_name_max_length... OK
+  Applying auth.0011_update_proxy_permissions... OK
+  Applying auth.0012_alter_user_first_name_max_length... OK
+  Applying producte.0001_initial... OK
+  Applying sessions.0001_initial... OK
+
+mariona@mariona-laptop:~/Documentos/altres-DABD/sessio6/dabd$ python3 manage.py createsuperuser
+Username (leave blank to use 'mariona'): 
+Email address: mariona@gmail.com
+Password: ****
+Password (again): ****
+This password is too short. It must contain at least 8 characters.
+This password is too common.
+This password is entirely numeric.
+Bypass password validation and create user anyway? [y/N]: y
+Superuser created successfully.
+
+
+2. Afegeix una nova entitat ProductCategory que siguin les categories (o famílies) de productes que permeti guardar el nom de la categoria, la categoria pare (per tal d'implementar una relació jeràrquica, una categoria pot contenir vàries subcategories i així successivament). 
+I entre les plantilles de productes i categories hi ha una relació de molts a molts (many2many), doncs una plantilla de productes pot pertànyer a vàries categories i viceversa (afegiu aquesta relació només en un lloc, per exemple un camp ManyToManyField a ProductCategory que apunti a ProductTemplate; 
+Django ja crea automàticament la taula intermèdia que implementa la relació de molts a molts). 
+Els camps categoria pare i plantilles de producte haurien de poder ser buits o nulls; mireu a la documentació de Django com podeu usar les opcions blank i null, doncs per defecte els camps no poden ser buits.
+
+
+mariona@mariona-laptop:~/Documentos/altres-DABD/sessio6/dabd/producte$ nano models.py 
+...
+class ProductCategory(models.Model):
+    name = models.CharField(max_length=200)
+    parent = models.ForeignKey(
+        'self', on_delete=models.CASCADE, 
+        null=True, blank=True, 
+        related_name='subcategories'
+    )
+    product_templates = models.ManyToManyField(
+        'ProductTemplate', 
+        blank=True, 
+        related_name='categories'
+    )
+
+    def __str__(self):
+        return self.name
+...
+
+mariona@mariona-laptop:~/Documentos/altres-DABD/sessio6/dabd$ python3 manage.py makemigrations
+Migrations for 'producte':
+  producte/migrations/0002_productcategory.py
+    - Create model ProductCategory
+mariona@mariona-laptop:~/Documentos/altres-DABD/sessio6/dabd$ python3 manage.py migrate
+Operations to perform:
+  Apply all migrations: admin, auth, contenttypes, producte, sessions
+Running migrations:
+  Applying producte.0002_productcategory... OK
+
+Fer que es pugui també gestionar per l'admin: 
+mariona@mariona-laptop:~/Documentos/altres-DABD/sessio6/dabd/producte$ cat admin.py 
+from django.contrib import admin
+
+# Register your models here.
+from .models import ProductTemplate, ProductVariant, ProductCategory
+
+admin.site.register(ProductTemplate)
+admin.site.register(ProductVariant)
+admin.site.register(ProductCategory)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
