@@ -148,9 +148,9 @@ DATABASES = {
        # 'ENGINE': 'django.db.backends.sqlite3',
        # 'NAME': BASE_DIR / 'db.sqlite3',
          'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'est..',  # Nom de la teva base de dades
-        'USER': 'est..',          # El teu usuari de PostgreSQL
-        'PASSWORD': 'dB...', # La contrasenya de PostgreSQL
+        'NAME': '..',  # Nom de la teva base de dades
+        'USER': '..',          # El teu usuari de PostgreSQL
+        'PASSWORD': '...', # La contrasenya de PostgreSQL
         'HOST': 'ubiwan.epsevg.upc.edu', # Servidor de la base de dades
         'PORT': '5432',            # Port del servidor de PostgreSQL
         }
@@ -240,6 +240,85 @@ admin.site.register(ProductVariant)
 admin.site.register(ProductCategory)
 
 	** PART 3 **
+Arranca la shell de python amb accés a Django i executa una a una aquestes instruccions per veure que passa. Comprovaràs que pots fer SQL queries amb simples instruccions Python. 
+Prèviament has d'haver afegit un parell de plantilles de producte des de la part d'administració de Django, afegeix per exemple "Bicicleta BMX" i "Bicicleta MTB".
+
+Entrar en el servidor en admin i fer ADD de Product Template: http://127.0.0.1:8080/admin/producte/producttemplate/ 
+
+Select product template to change
+ADD PRODUCT TEMPLATE
+Action: 
+---------
+ Go 0 of 2 selected
+
+PRODUCT TEMPLATE
+	Bicicleta MTB
+	Bicicleta BMX
+
+Entrar en el SHELL:
+
+python manage.py shell
+
+
+>>> from producte.models import ProductTemplate, ProductVariant, ProductCategory
+
+>>> # Obtenim tots els registres/objectes
+In [6]: ProductTemplate.objects.all()
+Out[6]: <QuerySet [<ProductTemplate: Bicicleta BMX>, <ProductTemplate: Bicicleta MTB>]>
+
+In [7]: templates = ProductTemplate.objects.all()
+   ...: for t in templates:
+   ...: ^Iprint(t.name, t.list_price, t.cost_price)
+   ...: 
+   
+Bicicleta BMX 25.00 30.00
+Bicicleta MTB 55.00 120.00
+
+>>> # Obtenim uns quants registres/objectes
+In [9]: templates = ProductTemplate.objects.filter(name='Bicicleta BMX')
+
+In [10]: templates[0]
+Out[10]: <ProductTemplate: Bicicleta BMX>
+
+In [11]: templates[0].list_price
+Out[11]: Decimal('25.00')
+
+
+>>> # Obtenim un únic registre/objecte i el modifiquem (també es pot usar update())
+
+In [12]: t = ProductTemplate.objects.get(name='Bicicleta BMX')
+
+In [13]: t
+Out[13]: <ProductTemplate: Bicicleta BMX>
+
+In [14]: t.list_price
+Out[14]: Decimal('25.00')
+
+In [15]: t.list_price=75.00
+
+In [16]: t.save()
+
+In [17]: t.list_price
+Out[17]: 75.0
+
+>>> # Creem un registre/objecte nou (també es pot usar create() i desprès l'eliminem
+In [18]: t = ProductTemplate(name='Monopatí', list_price=200, cost_price=120, salable=True)
+
+In [19]: ProductTemplate.objects.all()
+Out[19]: <QuerySet [<ProductTemplate: Bicicleta MTB>, <ProductTemplate: Bicicleta BMX>]>
+
+In [20]: t.save()
+
+In [21]: ProductTemplate.objects.all()
+Out[21]: <QuerySet [<ProductTemplate: Bicicleta MTB>, <ProductTemplate: Bicicleta BMX>, <ProductTemplate: Monopatí>]>
+
+In [22]: t=ProductTemplate.objects.get(name='Monopatí')
+
+In [23]: t.delete()
+Out[23]: (1, {'producte.ProductTemplate': 1})
+
+In [24]: ProductTemplate.objects.all()
+Out[24]: <QuerySet [<ProductTemplate: Bicicleta MTB>, <ProductTemplate: Bicicleta BMX>]>
 
 
 
