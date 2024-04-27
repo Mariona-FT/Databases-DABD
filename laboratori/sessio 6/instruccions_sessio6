@@ -1,0 +1,55 @@
+Instruccions utilitzades en la sessió 4:
+
+
+	** PART 1: **
+instal·lar django al sistema: 
+mariona@mariona-laptop:~$ python3 -m pip install Django
+
+Assegurar que s'ha instalat amb la comanda: 
+mariona@mariona-laptop:~$ python3 -m django --version
+5.0.4
+
+Crear una carpeta per aquesta sessió, i a dins d'aquesa crear el projecte de dabd:
+mariona@mariona-laptop:~/Documentos/altres-DABD/sessio6$ django-admin startproject dabd
+
+Dins d'aquesta ARRENCAR EL SERVIDOR: 
+mariona@mariona-laptop:~/Documentos/altres-DABD/sessio6/dabd$ python3 manage.py runserver 8080
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
+
+You have 18 unapplied migration(s). Your project may not work properly until you apply the migrations for app(s): admin, auth, contenttypes, sessions.
+Run 'python manage.py migrate' to apply them.
+April 27, 2024 - 10:41:01
+Django version 5.0.4, using settings 'dabd.settings'
+Starting development server at http://127.0.0.1:8080/
+Quit the server with CONTROL-C.
+
+Ara podrem entrar al server amb aquesta adreça: http://127.0.0.1:8080/
+
+Crear una APLICACIÓ dins del projecte per gestionar productes anomenada: producte
+
+mariona@mariona-laptop:~/Documentos/altres-DABD/sessio6/dabd$ python3 manage.py startapp producte
+mariona@mariona-laptop:~/Documentos/altres-DABD/sessio6/dabd$ ls
+dabd  db.sqlite3  manage.py  producte
+
+Crear una BASE DE DADES: 
+mariona@mariona-laptop:~/Documentos/altres-DABD/sessio6/dabd$ python3 manage.py migrate
+mariona@mariona-laptop:~/Documentos/altres-DABD/sessio6/dabd$ python3 manage.py createsuperuser
+Username (leave blank to use 'mariona'): 
+Email address: mariona@gmail.com
+Password: **** 
+Password (again): ****
+This password is too short. It must contain at least 8 characters.
+This password is too common.
+This password is entirely numeric.
+Bypass password validation and create user anyway? [y/N]: y
+Superuser created successfully.
+
+Ara es pot anar a: http://127.0.0.1:8080/admin
+On hi haurà un login del superuser: user:mariona contra:****
+mariona@mariona-laptop:~/Documentos/altres-DABD/sessio6/dabd$ python3 manage.py runserver 8080
+
+
+	** PART 2: **
