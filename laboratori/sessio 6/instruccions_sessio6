@@ -434,8 +434,14 @@ Aquest lhem de posar en la carpeta: django/dabd/producte/management/commands/cre
 
 mariona@mariona-laptop:~/Documentos/altres-DABD/sessio6/dabd$ cd producte/
 mariona@mariona-laptop:~/Documentos/altres-DABD/sessio6/dabd/producte$ mkdir -p management
+mariona@mariona-laptop:~/Documentos/altres-DABD/sessio6/dabd/producte$ cd management/
 mariona@mariona-laptop:~/Documentos/altres-DABD/sessio6/dabd/producte/management$ mkdir -p commands
-mariona@mariona-laptop:~/Documentos/altres-DABD/sessio6/dabd/producte/management/commands$ cat createdata.py 
+mariona@mariona-laptop:~/Documentos/altres-DABD/sessio6/dabd/producte/management$ cd commands/
+Crear el fitxer:
+mariona@mariona-laptop:~/Documentos/altres-DABD/sessio6/dabd/producte/management/commands$
+nano createdata.py 
+mariona@mariona-laptop:~/Documentos/altres-DABD/sessio6/dabd/producte/management/commands$
+cat createdata.py 
 import random
 import faker.providers
 from faker import Faker
@@ -524,7 +530,8 @@ class Command(BaseCommand):
     categories = ProductCategory.objects.all()
     print(categories.count(), "categories added.")
 
-Executar el script: 
+Executar el script en CARPETA ORIGINAL PROJECTE:
+
 mariona@mariona-laptop:~/Documentos/altres-DABD/sessio6/dabd$ python3 manage.py createdata 
 discipline animal 562.36 661.38 True
 water bottom 601.08 1096.88 False
