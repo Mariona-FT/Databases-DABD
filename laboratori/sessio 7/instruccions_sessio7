@@ -1,0 +1,8 @@
+Instruccions utilitzades en la sessió 7:
+
+descarregar les seguents carpetes en ubiwan:
+- dins de ubiwan!
+$ cd /home/public/dabd/
+cu@ubiwan:/home/public/dabd$ cp -r 07/ /home/est/userubi/DABD/sessio7
+
+
