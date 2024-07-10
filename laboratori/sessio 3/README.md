@@ -240,3 +240,8 @@ Foreign-key constraints:
     "contractes_acc_id_fkey" FOREIGN KEY (acc_id) REFERENCES comptes(acc_id) ON UPDATE CASCADE ON DELETE SET NULL
     "contractes_owner_id_fkey" FOREIGN KEY (owner_id) REFERENCES titulars(owner_id) ON UPDATE CASCADE ON DELETE SET NULL
 ```
+La extracció de totes les taules per sql seria:
+- taula adreces : [dataadreces.sql](https://github.com/Mariona-FT/Databases-DABD/blob/main/laboratori/sessio%203/dataadreces.sql)
+- taula comptes : [datacomptes.sql](https://github.com/Mariona-FT/Databases-DABD/blob/main/laboratori/sessio%203/datacomptes.sql)
+- taula contractes : [datacontractes.sql](https://github.com/Mariona-FT/Databases-DABD/blob/main/laboratori/sessio%203/datacontractes.sql)
+- taula titulars : [datatitulars.sql](https://github.com/Mariona-FT/Databases-DABD/blob/main/laboratori/sessio%203/datatitulars.sql)
