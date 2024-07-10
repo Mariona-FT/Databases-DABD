@@ -269,7 +269,7 @@ Esquema taula:
 (9 rows)
 ```
 
-### Consultes básiques:
+#### Consultes básiques:
 - Ordenades per director ascendent:
 ```
 SELECT * FROM movies ORDER BY director ASC;
