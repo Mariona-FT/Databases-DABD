@@ -374,7 +374,7 @@ In [24]: ProductTemplate.objects.all()
 Out[24]: <QuerySet [<ProductTemplate: Bicicleta MTB>, <ProductTemplate: Bicicleta BMX>]>
 ```
 
-### PART 4
+### PART 4:
 Ara crear una simple pàgina web en la part pública del nostre web,
 En _producte/views.py_ posar les vistes que es volen implementar. 
 Ara fer un llistat dels productes que es poden oferir
@@ -466,7 +466,7 @@ El llistat son enllaços que porta a una pàgina amb la seva informació:
     - Nom: Bicicleta BMX
     - Preu venda: 75.00
 
-### PART 5
+### PART 5:
 	
 Crear dades ficticies
 
